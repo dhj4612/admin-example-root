@@ -1,0 +1,7 @@
+org.example.framework.common.designpattern.config.DesignPatternAutoConfiguration
+org.example.framework.web.config.WebAutoConfiguration
+org.example.framework.database.config.MyBatisPlusConfiguration
+org.example.framework.security.config.SecurityConfiguration
+org.example.framework.utils.config.UtilsConfiguration
+org.example.framework.idempotent.config.IdempotentConfiguration
+

@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    url: jdbc:mysql://172.24.211.113:3306/admin_example?allowMultiQueries=true&rewriteBatchedStatements=true&useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: root
+    password: 'root'
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: 172.24.211.113
+      port: 6379
+      password: '111111'
+      database: 0
+  mvc:
+    static-path-pattern: '/static/**'
+  main:
+    allow-circular-references: true
+  servlet:
+    multipart:
+      max-file-size: 10240MB
+      max-request-size: 10MB
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: 'classpath*:/**/*Mapper.xml'
+
+# token 相关配置
+jwt:
+  secret: '0nJ7/jp48ebg4K0B4EMYog=='
+  expire: 86400000 # token 过期时间
+  header-key: 'Authorization'
+
+# 数据库 AES 加密配置
+db-aes-key: 'CGjbN1QmsU2TYDiuiy5Zsg=='
+
+# AES 加密配置
+aes:
+  key: 'Ojj5FNlpl9HY1lqiTebZWQ=='
+
+# xss 配置
+xss:
+  enable: true
+  excludes: ~
