@@ -6,6 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.framework.common.base.Result;
 import org.example.framework.common.exception.BizException;
 import org.springframework.core.MethodParameter;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -67,6 +70,18 @@ public class GlobalExceptionHandler {
                         fieldError.getDefaultMessage() :
                         err.getDefaultMessage()).collect(Collectors.toSet());
         return Result.errMsg(String.join(",", errs));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public Result<?> badCredentialsExceptionHandler(BadCredentialsException e) {
+        log.error("认证异常：", e);
+        return Result.errMsg(e.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public Result<?> authenticationExceptionHandler(AccessDeniedException e) {
+        log.error("授权异常：", e);
+        return Result.errMsg(e.getMessage());
     }
 
     @ExceptionHandler(BizException.class)

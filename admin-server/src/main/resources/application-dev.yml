@@ -27,7 +27,7 @@ mybatis-plus:
 # token 相关配置
 jwt:
   secret: '0nJ7/jp48ebg4K0B4EMYog=='
-  expire: 86400000 # token 过期时间
+  expire: 86400000 # token 过期时间（1天）
   header-key: 'Authorization'
 
 # 数据库 AES 加密配置

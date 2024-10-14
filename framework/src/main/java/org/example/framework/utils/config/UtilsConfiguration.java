@@ -3,7 +3,6 @@ package org.example.framework.utils.config;
 import lombok.RequiredArgsConstructor;
 import org.example.framework.utils.AesUtil;
 import org.example.framework.utils.ApiResourcesUtil;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -20,9 +19,7 @@ public class UtilsConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(name = "")
     public AesUtil aesUtil(AesProperties properties) {
         return new AesUtil(properties.getKey());
     }
-
 }
