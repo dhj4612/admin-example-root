@@ -1,25 +1,21 @@
 package org.example.framework.utils.config;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.framework.utils.AesUtil;
-import org.example.framework.utils.ApiResourcesUtil;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
 
+@Slf4j
 @RequiredArgsConstructor
 @EnableConfigurationProperties({AesProperties.class})
 public class UtilsConfiguration {
 
-    private final ApplicationContext applicationContext;
+    private final AesProperties aesProperties;
 
-    @Bean
-    public ApiResourcesUtil apiResourcesUtil() {
-        return new ApiResourcesUtil(applicationContext);
-    }
-
-    @Bean
-    public AesUtil aesUtil(AesProperties properties) {
-        return new AesUtil(properties.getKey());
+    @PostConstruct
+    public void init() {
+        AesUtil.init(aesProperties.getKey());
+        log.info("UtilsConfiguration init complete......");
     }
 }

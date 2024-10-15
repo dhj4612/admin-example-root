@@ -1,8 +1,6 @@
 package org.example.framework.common.base;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -10,6 +8,10 @@ import java.time.LocalDateTime;
 
 @Data
 public class BaseEntity implements Serializable {
+
+    @TableId(type = IdType.AUTO)
+    private Integer id;
+
     /**
      * 逻辑删除 0-未删除 1-删除
      */

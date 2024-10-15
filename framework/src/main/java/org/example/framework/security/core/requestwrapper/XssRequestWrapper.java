@@ -3,7 +3,7 @@ package org.example.framework.security.core.requestwrapper;
 import cn.hutool.core.util.StrUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
-import org.example.framework.utils.XssUtils;
+import org.example.framework.utils.XssUtil;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -66,6 +66,6 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
         if (StrUtil.isBlank(content)) {
             return content;
         }
-        return XssUtils.filter(content);
+        return XssUtil.filter(content);
     }
 }

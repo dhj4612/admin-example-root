@@ -7,6 +7,7 @@ import org.example.framework.security.core.filter.XssFilter;
 import org.example.framework.security.core.handler.SecurityAccessDeniedHandler;
 import org.example.framework.security.core.handler.SecurityAuthenticationEntryPoint;
 import org.example.framework.utils.ApiResourcesUtil;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -33,14 +34,14 @@ public class SecurityConfig {
      */
     private final OncePerRequestFilter authenticationTokenFilter;
 
-    private final ApiResourcesUtil apiResourcesUtil;
-
     private final XssProperties xssProperties;
+
+    private final ApplicationContext applicationContext;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // 忽略授权的地址列表
-        List<String> allowResources = apiResourcesUtil.getApiResourceByAnnotation(Anonymous.class);
+        List<String> allowResources = ApiResourcesUtil.getApiResourceByAnnotation(applicationContext, Anonymous.class);
         http
                 // xss 防护
                 .headers(headers -> headers.contentSecurityPolicy(csp -> csp.policyDirectives("script-src 'self'; object-src 'none';")))

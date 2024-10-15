@@ -31,7 +31,8 @@ jwt:
   header-key: 'Authorization'
 
 # 数据库 AES 加密配置
-db-aes-key: 'CGjbN1QmsU2TYDiuiy5Zsg=='
+db:
+  aes-key: 'CGjbN1QmsU2TYDiuiy5Zsg=='
 
 # AES 加密配置
 aes:

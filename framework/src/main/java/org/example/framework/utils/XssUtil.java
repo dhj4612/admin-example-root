@@ -7,7 +7,7 @@ import org.jsoup.safety.Safelist;
 /**
  * XSS 过滤工具类
  */
-public class XssUtils {
+public class XssUtil {
     /**
      * 不格式化
      */

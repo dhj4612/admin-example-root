@@ -1,33 +1,35 @@
 package org.example.framework.utils;
 
 import cn.hutool.crypto.SecureUtil;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.example.framework.common.exception.BizException;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.util.Base64;
 
-@RequiredArgsConstructor
+@Slf4j
 public class AesUtil {
 
-    private final String aesKey;
+    private static String Key;
+
+    public static void init(String aesKey) {
+        Key = aesKey;
+        log.info("AesUtil init complete......");
+    }
+
+    public static String encrypt(String dataStr) {
+        return encrypt(Key, dataStr);
+    }
+
+    public static String decrypt(String encryptDataStr) {
+        return decrypt(Key, encryptDataStr);
+    }
 
     /**
      * 生成 AES 算法的密钥
      */
-    public String generateAesKey() {
+    public static String generateAesKey() {
         return Base64.getEncoder().encodeToString(SecureUtil.generateKey("AES").getEncoded());
-    }
-
-    public String encrypt(String dataStr) {
-        return encrypt(aesKey, dataStr);
-    }
-
-    public String decrypt(String encryptDataStr) {
-        return decrypt(aesKey, encryptDataStr);
     }
 
     /**

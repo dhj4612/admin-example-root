@@ -1,7 +1,6 @@
 package org.example.admin.framework.securty.core;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -9,11 +8,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.example.framework.security.config.JwtProperties;
+import org.example.framework.security.core.user.UserAuthorized;
+import org.example.framework.security.core.utils.JwtUtil;
 import org.example.framework.utils.HttpServletUtil;
-import org.example.framework.security.core.utils.JwtTokenUtil;
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -23,7 +25,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class AuthenticationTokenFilter extends OncePerRequestFilter {
 
     private final JwtProperties jwtProperties;
-    private final JwtTokenUtil jwtTokenUtil;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -43,15 +44,16 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
             }
 
             String jwt = authorizationHeader.substring(7);
-            DecodedJWT decodedJWT = jwtTokenUtil.verifyAccessToken(jwt);
+            UserAuthorized userAuthorized = JwtUtil.verifyJwtStrAndGetForCache(jwt);
 
-            // TODO 设置用户上下文信息
-            //UsernamePasswordAuthenticationToken authentication =
-            //        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            //authentication.setDetails(
-            //        new WebAuthenticationDetailsSource().buildDetails(request)
-            //);
-            //context.setAuthentication(authentication);
+            // 设置用户上下文信息
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(userAuthorized, null,
+                            userAuthorized.getAuthoritiesAdaptionSecurity());
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request)
+            );
+            context.setAuthentication(authentication);
 
             // 放行
             chain.doFilter(request, response);

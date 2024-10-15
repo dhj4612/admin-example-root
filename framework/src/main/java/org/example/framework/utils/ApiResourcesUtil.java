@@ -1,21 +1,18 @@
 package org.example.framework.utils;
 
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-@RequiredArgsConstructor
+@Slf4j
 public class ApiResourcesUtil {
-
-    private final ApplicationContext applicationContext;
-
     /**
      * 根据注解类型获取Api资源
      */
-    public <T extends Annotation> List<String> getApiResourceByAnnotation(Class<T> annotationType) {
+    public static <T extends Annotation> List<String> getApiResourceByAnnotation(ApplicationContext applicationContext, Class<T> annotationType) {
         RequestMappingHandlerMapping handlerMapping = applicationContext
                 .getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
 
@@ -28,11 +25,11 @@ public class ApiResourcesUtil {
                     return methodAnnotationPresent || beanAnnotationPresent;
                 })
                 .flatMap(entry -> entry.getKey().getPatternValues().stream())
-                .map(this::convertToAntPattern)
+                .map(ApiResourcesUtil::convertToAntPattern)
                 .toList();
     }
 
-    private String convertToAntPattern(String path) {
+    private static String convertToAntPattern(String path) {
         return path.replaceAll("\\{[^}]+}", "*");
     }
 }
