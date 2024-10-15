@@ -87,7 +87,7 @@ public class JwtUtil {
     public static UserAuthorized verifyJwtStrAndGetForCache(String jwtStr) {
         verifyJwtStr(jwtStr);
         String value = StringRedisTemplate.opsForValue().get(jwtStr);
-        if (StringUtils.isBlank(value) || JSONUtil.isTypeJSON(value)) {
+        if (StringUtils.isBlank(value) || !JSONUtil.isTypeJSON(value)) {
             throw BizException.valueOfMsg("用户授权令牌非法或已过期");
         }
         return JSONUtil.toBean(value, UserAuthorized.class);

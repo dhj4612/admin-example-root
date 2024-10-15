@@ -58,8 +58,10 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
             // 放行
             chain.doFilter(request, response);
         } catch (JWTVerificationException e) {
+            log.error("非法授权：", e);
             HttpServletUtil.responseExceptionJsonData(response, "非法授权");
         } catch (Throwable e) {
+            log.error("登录校验失败：", e);
             HttpServletUtil.responseExceptionJsonData(response, "登录校验失败");
         }
     }

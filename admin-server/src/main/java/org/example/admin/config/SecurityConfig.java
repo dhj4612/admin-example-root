@@ -2,7 +2,7 @@ package org.example.admin.config;
 
 import lombok.RequiredArgsConstructor;
 import org.example.framework.security.config.XssProperties;
-import org.example.framework.security.core.annotation.annotation.Anonymous;
+import org.example.framework.security.core.annotation.Anonymous;
 import org.example.framework.security.core.filter.XssFilter;
 import org.example.framework.security.core.handler.SecurityAccessDeniedHandler;
 import org.example.framework.security.core.handler.SecurityAuthenticationEntryPoint;

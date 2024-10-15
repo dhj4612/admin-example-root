@@ -7,11 +7,10 @@ import org.example.admin.model.dto.req.UserPhoneRegisterDTO;
 import org.example.admin.model.dto.resp.UserLoginRespDTO;
 import org.example.admin.service.SysUserService;
 import org.example.framework.common.base.Result;
-import org.example.framework.security.core.annotation.annotation.Anonymous;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.example.framework.security.core.annotation.Anonymous;
+import org.example.framework.security.core.user.SecurityUserContext;
+import org.example.framework.security.core.user.UserAuthorized;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/sys/user")
@@ -31,5 +30,10 @@ public class UserController {
     @Anonymous
     public Result<UserLoginRespDTO> register(@RequestBody @Valid UserPhoneLoginDTO param) {
         return Result.ok(sysUserService.phoneLogin(param));
+    }
+
+    @GetMapping("/info")
+    public Result<UserAuthorized> info() {
+        return Result.ok(SecurityUserContext.ensureGetUser());
     }
 }
