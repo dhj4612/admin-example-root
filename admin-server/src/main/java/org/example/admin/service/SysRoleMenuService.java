@@ -1,7 +1,10 @@
 package org.example.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.validation.constraints.NotEmpty;
 import org.example.admin.model.entity.SysRoleMenu;
+
+import java.util.Set;
 
 /**
  * 角色与菜单对应关系
@@ -9,5 +12,5 @@ import org.example.admin.model.entity.SysRoleMenu;
  */
 public interface SysRoleMenuService extends IService<SysRoleMenu> {
 
-
+    void saveOrUpdateRoleMenu(Integer id, @NotEmpty(message = "权限列表不能为空") Set<Integer> menuIds);
 }

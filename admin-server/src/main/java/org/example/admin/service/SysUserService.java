@@ -2,9 +2,10 @@ package org.example.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.validation.Valid;
-import org.example.admin.model.dto.req.UserPhoneLoginDTO;
-import org.example.admin.model.dto.req.UserPhoneRegisterDTO;
-import org.example.admin.model.dto.resp.UserLoginRespDTO;
+import org.example.admin.model.param.UserPhoneLoginParam;
+import org.example.admin.model.param.UserSaveOrUpdateParam;
+import org.example.admin.model.result.UserInfoResult;
+import org.example.admin.model.result.UserLoginResult;
 import org.example.admin.model.entity.SysUser;
 
 /**
@@ -12,7 +13,10 @@ import org.example.admin.model.entity.SysUser;
  */
 public interface SysUserService extends IService<SysUser> {
 
-    void phoneRegister(@Valid UserPhoneRegisterDTO param);
+    void userSaveOrUpdate(@Valid UserSaveOrUpdateParam param);
 
-    UserLoginRespDTO phoneLogin(@Valid UserPhoneLoginDTO param);
+    UserLoginResult phoneLogin(@Valid UserPhoneLoginParam param);
+
+    UserInfoResult getUserInfo();
+
 }

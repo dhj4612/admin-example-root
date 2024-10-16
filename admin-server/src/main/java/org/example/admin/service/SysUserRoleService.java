@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public interface SysUserRoleService extends IService<SysUserRole> {
 
-    void saveUserRoleRelation(SysUser sysUser, @NotNull(message = "角色列表不能为空") Set<Integer> roles);
+    void saveOrUpdateUserRoleRelation(SysUser sysUser, @NotNull(message = "角色列表不能为空") Set<Integer> roleIds);
 
     Set<String> getUserRolesByUserId(@Param("id") Integer id);
 }

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -27,8 +26,8 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveUserRoleRelation(SysUser sysUser, Set<Integer> roles) {
-        if (CollUtil.isEmpty(roles)) {
+    public void saveOrUpdateUserRoleRelation(SysUser sysUser, Set<Integer> roleIds) {
+        if (CollUtil.isEmpty(roleIds)) {
             throw BizException.valueOfMsg("角色列表不能为空");
         }
         final Integer userId = sysUser.getId();
@@ -37,22 +36,21 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
                 .list().stream().map(SysUserRole::getRoleId).toList();
 
         // 需要新增的角色id集合
-        Collection<Integer> insertRoleIdList = CollUtil.subtract(roles, userRoleIds);
+        Collection<Integer> saveRoleIds = CollUtil.subtract(roleIds, userRoleIds);
         // 建立新的关联关系
-        List<SysUserRole> userRoleList = insertRoleIdList.stream().map(id -> new SysUserRole().setRoleId(id).setUserId(userId))
+        List<SysUserRole> userRoleList = saveRoleIds.stream().map(id -> new SysUserRole().setRoleId(id).setUserId(userId))
                 .toList();
         saveBatch(userRoleList);
 
         // 查出旧的关联关系删除
         lambdaUpdate()
                 .eq(SysUserRole::getUserId, sysUser.getId())
-                .in(SysUserRole::getRoleId, CollUtil.subtract(userRoleIds, roles))
+                .in(SysUserRole::getRoleId, CollUtil.subtract(userRoleIds, roleIds))
                 .remove();
     }
 
     @Override
     public Set<String> getUserRolesByUserId(Integer id) {
-        Set<String> roleSet = baseMapper.selectRoleListByUserId(id);
-        return CollUtil.isEmpty(roleSet) ? Collections.emptySet() : roleSet;
+        return baseMapper.selectRoleListByUserId(id);
     }
 }

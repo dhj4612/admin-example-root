@@ -2,14 +2,13 @@ package org.example.admin.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.admin.model.dto.req.UserPhoneLoginDTO;
-import org.example.admin.model.dto.req.UserPhoneRegisterDTO;
-import org.example.admin.model.dto.resp.UserLoginRespDTO;
+import org.example.admin.model.param.UserPhoneLoginParam;
+import org.example.admin.model.param.UserSaveOrUpdateParam;
+import org.example.admin.model.result.UserInfoResult;
+import org.example.admin.model.result.UserLoginResult;
 import org.example.admin.service.SysUserService;
 import org.example.framework.common.base.Result;
 import org.example.framework.security.core.annotation.Anonymous;
-import org.example.framework.security.core.user.SecurityUserContext;
-import org.example.framework.security.core.user.UserAuthorized;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,21 +18,21 @@ public class UserController {
 
     private final SysUserService sysUserService;
 
-    @PostMapping("/phone/register")
+    @PostMapping("/save-or-update")
     @Anonymous
-    public Result<Void> register(@RequestBody @Valid UserPhoneRegisterDTO param) {
-        sysUserService.phoneRegister(param);
+    public Result<Void> save(@RequestBody @Valid UserSaveOrUpdateParam param) {
+        sysUserService.userSaveOrUpdate(param);
         return Result.ok();
     }
 
     @PostMapping("/phone/login")
     @Anonymous
-    public Result<UserLoginRespDTO> register(@RequestBody @Valid UserPhoneLoginDTO param) {
+    public Result<UserLoginResult> register(@RequestBody @Valid UserPhoneLoginParam param) {
         return Result.ok(sysUserService.phoneLogin(param));
     }
 
     @GetMapping("/info")
-    public Result<UserAuthorized> info() {
-        return Result.ok(SecurityUserContext.ensureGetUser());
+    public Result<UserInfoResult> info() {
+        return Result.ok(sysUserService.getUserInfo());
     }
 }

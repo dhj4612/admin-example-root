@@ -3,6 +3,7 @@ package org.example.admin.model.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 import org.example.framework.common.base.BaseEntity;
 
 /**
@@ -11,6 +12,7 @@ import org.example.framework.common.base.BaseEntity;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @TableName("sys_role_menu")
+@Accessors(chain = true)
 public class SysRoleMenu extends BaseEntity {
 	/**
 	 * 角色ID

@@ -3,15 +3,18 @@ package org.example.admin.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.example.admin.mapper.SysUserMapper;
-import org.example.admin.model.dto.req.UserPhoneLoginDTO;
-import org.example.admin.model.dto.req.UserPhoneRegisterDTO;
-import org.example.admin.model.dto.resp.UserLoginRespDTO;
+import org.example.admin.model.param.UserPhoneLoginParam;
+import org.example.admin.model.param.UserSaveOrUpdateParam;
+import org.example.admin.model.result.UserInfoResult;
+import org.example.admin.model.result.UserLoginResult;
 import org.example.admin.model.entity.SysUser;
 import org.example.admin.service.SysMenuService;
 import org.example.admin.service.SysUserRoleService;
 import org.example.admin.service.SysUserService;
+import org.example.framework.common.base.BaseEntity;
 import org.example.framework.common.exception.BizException;
 import org.example.framework.database.core.DbEncryptHelper;
+import org.example.framework.security.core.user.SecurityUserContext;
 import org.example.framework.security.core.user.UserAuthorized;
 import org.example.framework.security.core.utils.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.Objects;
+import java.util.Optional;
 
 
 /**
@@ -36,31 +40,37 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void phoneRegister(UserPhoneRegisterDTO param) {
+    public void userSaveOrUpdate(UserSaveOrUpdateParam param) {
+        final boolean update = param.id() != null;
         SysUser sysUser = lambdaQuery()
                 .eq(SysUser::getMobile, DbEncryptHelper.encrypt(param.phone()))
                 .or()
                 .eq(SysUser::getUsername, param.username())
                 .one();
+        Assert.isNull(sysUser, "手机号或用户名已经存在");
 
-        if (sysUser != null) {
-            throw BizException.valueOfMsg("用户手机号或用户名已经存在");
+        if (update) {
+            sysUser = lambdaQuery()
+                    .eq(SysUser::getStatus, 1)
+                    .eq(BaseEntity::getId, param.id()).one();
+            Assert.notNull(sysUser, "用户不存在或已禁用");
+        } else {
+            sysUser = new SysUser();
         }
 
-        sysUser = new SysUser();
         sysUser.setUsername(param.username());
         sysUser.setPassword(passwordEncoder.encode(param.password()));
         sysUser.setMobile(param.phone());
         sysUser.setStatus(1);
         sysUser.setSuperAdmin(0);
 
-        save(sysUser);
+        saveOrUpdate(sysUser);
 
-        //sysUserRoleService.saveUserRoleRelation(sysUser, param.roles());
+        sysUserRoleService.saveOrUpdateUserRoleRelation(sysUser, param.roleIds());
     }
 
     @Override
-    public UserLoginRespDTO phoneLogin(UserPhoneLoginDTO param) {
+    public UserLoginResult phoneLogin(UserPhoneLoginParam param) {
         SysUser sysUser = lambdaQuery()
                 .eq(SysUser::getMobile, DbEncryptHelper.encrypt(param.phone()))
                 .one();
@@ -74,6 +84,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 .setRoles(sysUserRoleService.getUserRolesByUserId(sysUser.getId()));
         String jwt = JwtUtil.createJwtStrAndCache(userAuthorized);
         String refreshJwtStr = JwtUtil.createRefreshJwtStr(userAuthorized);
-        return new UserLoginRespDTO(jwt, refreshJwtStr);
+        return new UserLoginResult(jwt, refreshJwtStr);
+    }
+
+    @Override
+    public UserInfoResult getUserInfo() {
+        SysUser sysUser = lambdaQuery()
+                .eq(BaseEntity::getId, SecurityUserContext.ensureGetUser())
+                .eq(SysUser::getStatus, 1)
+                .one();
+        Optional.ofNullable(sysUser)
+                .orElseThrow(() -> BizException.valueOfMsg("用户不存在或已禁用"));
+        return new UserInfoResult(sysUser.getUsername(), sysUser.getAvatar());
     }
 }
