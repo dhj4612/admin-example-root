@@ -21,14 +21,14 @@ public class SysManagerController {
     private final SysRoleService sysRoleService;
 
     @PostMapping("/role-add-or-update")
-    @PreAuthorize("hasAnyAuthority('sys:manager:role:add','sys:manager:role:update')")
+    @PreAuthorize("hasAnyAuthority('sys:role:add','sys:role:update')")
     public Result<Void> addOrUpdateRole(@RequestBody @Valid RoleAddOrUpdateParam param) {
         sysRoleService.addOrUpdateRole(param);
         return Result.ok();
     }
 
     @PostMapping("/menu-add-or-update")
-    @PreAuthorize("hasAnyAuthority('sys:manager:menu:add','sys:manager:menu:update')")
+    @PreAuthorize("hasAnyAuthority('sys:menu:add','sys:menu:update')")
     public Result<Void> addOrUpdateMenu(@RequestBody @Valid MenuAddOrUpdateParam param) {
         sysMenuService.addOrUpdateMenu(param);
         return Result.ok();

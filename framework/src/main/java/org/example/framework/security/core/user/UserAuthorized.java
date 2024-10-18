@@ -25,19 +25,19 @@ public class UserAuthorized {
      * 返回适配 security 的用户权限&角色标识，方便使用 @PreAuthorize 注解校验权限
      */
     public Collection<? extends GrantedAuthority> getAuthoritiesAdaptionSecurity() {
-        final Set<SimpleGrantedAuthority> resultAuthorities = new HashSet<>();
+        final Set<SimpleGrantedAuthority> securityAuthorities = new HashSet<>();
         if (CollUtil.isNotEmpty(this.authorities)) {
-            resultAuthorities.addAll(authorities.stream()
+            securityAuthorities.addAll(authorities.stream()
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toSet()));
         }
         if (CollUtil.isNotEmpty(this.roles)) {
-            resultAuthorities.addAll(
+            securityAuthorities.addAll(
                     roles.stream()
                             .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                             .collect(Collectors.toSet())
             );
         }
-        return resultAuthorities;
+        return securityAuthorities;
     }
 }
