@@ -49,12 +49,18 @@ public class JwtUtil {
      * 创建 jwt 并且缓存
      */
     public static String createJwtStrAndCache(UserAuthorized userAuthorized) {
+        final String encryptUserId = AesUtil.encrypt(String.valueOf(userAuthorized.getId()));
         String jwt = JWT.create()
-                .withJWTId(AesUtil.encrypt(String.valueOf(userAuthorized.getId())))
+                .withJWTId(encryptUserId)
                 .withIssuer("com.example.dhj")
                 .withExpiresAt(DateUtils.addMilliseconds(new Date(), JwtProperties.getExpire()))
                 .sign(Algorithm.HMAC256(JwtProperties.getSecret().getBytes()));
-        StringRedisTemplate.opsForValue().set(jwt, JSONUtil.toJsonStr(userAuthorized), JwtProperties.getExpire(), TimeUnit.MILLISECONDS);
+        StringRedisTemplate.opsForValue().set(
+                "login:session:" + encryptUserId,
+                JSONUtil.toJsonStr(userAuthorized),
+                JwtProperties.getExpire(),
+                TimeUnit.MILLISECONDS
+        );
         return jwt;
     }
 
@@ -85,8 +91,8 @@ public class JwtUtil {
     }
 
     public static UserAuthorized verifyJwtStrAndGetForCache(String jwtStr) {
-        verifyJwtStr(jwtStr);
-        String value = StringRedisTemplate.opsForValue().get(jwtStr);
+        DecodedJWT jwt = verifyJwtStr(jwtStr);
+        String value = StringRedisTemplate.opsForValue().get("login:session:" + jwt.getId());
         if (StringUtils.isBlank(value) || !JSONUtil.isTypeJSON(value)) {
             throw BizException.valueOfMsg("用户授权令牌非法或已过期");
         }
