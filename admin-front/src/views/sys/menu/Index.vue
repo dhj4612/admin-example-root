@@ -6,7 +6,7 @@ console.log(router.currentRoute);
 </script>
 
 <template>
-  <h1>Menu Index</h1>
+  <h1 v-auth="'sys:menu:update'">Menu Index</h1>
 </template>
 
 <style scoped>

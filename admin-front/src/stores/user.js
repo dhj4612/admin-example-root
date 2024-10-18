@@ -33,6 +33,16 @@ export const useUserStore = defineStore('user', () => {
         return !!user.username
     }
 
+    function hasAuthorities(auth) {
+        if (user.authorities.includes('*')) {
+            return true;
+        }
+        if (!Array.isArray(auth)) {
+            auth = [auth]
+        }
+        return auth.every(item => user.authorities.includes(item))
+    }
+
     async function fetchUserInfo() {
         const [res, err] = await fetchUserInfoApi()
         if (err) throw err
@@ -45,6 +55,7 @@ export const useUserStore = defineStore('user', () => {
         fetchUserInfo,
         fetchAuthorities,
         hasUserInfo,
-        clearUserInfo
+        clearUserInfo,
+        hasAuthorities
     }
 })
