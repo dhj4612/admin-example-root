@@ -6,9 +6,11 @@ import org.example.admin.mapper.SysMenuMapper;
 import org.example.admin.model.entity.SysMenu;
 import org.example.admin.model.param.MenuAddOrUpdateParam;
 import org.example.admin.service.SysMenuService;
+import org.example.framework.security.core.user.UserAuthorized;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -50,5 +52,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         menu.setPid(param.pid());
 
         saveOrUpdate(menu);
+    }
+
+    @Override
+    public List<SysMenu> getUserMenuList(UserAuthorized user, Integer type) {
+        return baseMapper.selectMenuListByUserAndType(user, type);
     }
 }

@@ -30,6 +30,15 @@ export const throttle = (fnc, wait = 1000) => {
 }
 
 /**
+ * 路径转换为驼峰形式 /login/user => LoginUser
+ * @param path
+ * @returns {*}
+ */
+export const pathToCamel = (path) => {
+    return path.replace(/\/(\w)/g, (all, letter) => letter.toUpperCase())
+}
+
+/**
  * 等待指定毫秒时间
  * @param delay
  * @return {Promise<unknown>}

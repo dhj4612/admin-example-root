@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 @Accessors(chain = true)
 public class UserAuthorized {
     private Integer id;
+    private boolean superAdmin;
 
     // 存放用户权限标识和角色标识的集合
     private Set<String> authorities;
@@ -26,7 +27,9 @@ public class UserAuthorized {
     public Collection<? extends GrantedAuthority> getAuthoritiesAdaptionSecurity() {
         final Set<SimpleGrantedAuthority> resultAuthorities = new HashSet<>();
         if (CollUtil.isNotEmpty(this.authorities)) {
-            resultAuthorities.addAll(authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet()));
+            resultAuthorities.addAll(authorities.stream()
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toSet()));
         }
         if (CollUtil.isNotEmpty(this.roles)) {
             resultAuthorities.addAll(

@@ -1,4 +1,4 @@
-import {post, postFile} from "@/utils/request.js";
+import {get, post, postFile} from "@/utils/request.js";
 
 export const codeKey = 'code'
 export const messageKey = 'msg'
@@ -26,3 +26,9 @@ const ApiWrapper = (apiAction, options = def_options) => {
 export const exampleApi = (data = {}) => ApiWrapper(post('/example', data))
 
 export const loginApi = (data = {}) => ApiWrapper(post('/sys/user/phone/login', data))
+
+export const fetchAuthoritiesApi = _ => ApiWrapper(get('/sys/user/authorities'))
+
+export const fetchUserInfoApi = _ => ApiWrapper(get('/sys/user/info'))
+
+export const fetchUserMenuNavApi = _ => ApiWrapper(get('/sys/user/menu/nav'))

@@ -1,3 +1,6 @@
+import {useUserStore} from "@/stores/user.js";
+import {useMenusStore} from "@/stores/menus.js";
+
 export const AuthorizationKey = 'Authorization'
 export const RefreshAuthorizationKey = 'RefreshAuthorization'
 
@@ -12,3 +15,10 @@ export const hasRefreshAuthorization = () => !!localStorage.getItem(RefreshAutho
 
 export const removeAuthorization = () => localStorage.removeItem(AuthorizationKey)
 export const removeRefreshAuthorization = () => localStorage.removeItem(RefreshAuthorizationKey)
+
+export const clearAll = _ => {
+    removeAuthorization()
+    removeRefreshAuthorization()
+    useUserStore().clearUserInfo()
+    useMenusStore().clearMenus()
+}

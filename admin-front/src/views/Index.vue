@@ -6,25 +6,49 @@
                     :trigger="null"
                     theme="dark"
                     collapsible>
-      <div class="logo">
-        <img style="width: 85px;padding: 3px" :src="elementLogo" alt="...">
+      <div class="logo" @click="router.push('/')">
+        <img class="log-img" :src="elementLogo" alt="...">
         <p class="logo-text">Admin</p>
       </div>
-      <a-menu v-model:selectedKeys="selectedKeys" theme="dark" mode="inline">
-        <a-menu-item key="1">
-          <UserOutlined/>
-          <span>nav 1</span>
-        </a-menu-item>
-        <a-menu-item key="2">
-          <VideoCameraOutlined/>
-          <span>nav 2</span>
-        </a-menu-item>
-        <a-menu-item key="3">
-          <UploadOutlined/>
-          <span>nav 3</span>
-        </a-menu-item>
+      <a-menu v-model:selectedKeys="selectedKeys"
+              @click="item =>
+              item?.item?.path &&
+              item.item.path !== router.currentRoute.value.meta.url &&
+              router.push(item.item.path)"
+              theme="dark"
+              mode="inline">
+        <template v-for="menu in menusStore.menus">
+          <template v-if="!menu.children || !menu.children.length">
+            <a-menu-item :key="menu.id" :path="menu.url">
+              <template #icon>
+                <DynamicIcon :type="menu.icon || 'BarsOutlined'"/>
+              </template>
+              <template #title>
+                {{ menu.name }}
+              </template>
+            </a-menu-item>
+          </template>
+
+          <template v-else>
+            <a-sub-menu>
+              <template #icon>
+                <DynamicIcon :type="menu.icon || 'BarsOutlined'"/>
+              </template>
+              <!--顶层菜单名称-->
+              <template #title>
+                {{ menu.name }}
+              </template>
+
+              <a-menu-item v-for="subMenu in menu.children" :key="subMenu.id" :path="subMenu.url">
+                <DynamicIcon :type="subMenu.icon || 'BarsOutlined'"/>
+                <span>{{ subMenu.name }}</span>
+              </a-menu-item>
+            </a-sub-menu>
+          </template>
+        </template>
       </a-menu>
     </a-layout-sider>
+
     <a-layout style="height: 100vh">
       <a-layout-header style="width: 100%;height: 50px;background: #fff;padding: 0 5px;">
         <div style="display: flex;height: 50px;">
@@ -36,93 +60,33 @@
                 @click="_ => collapsed = !collapsed"/>
             <MenuUnfoldOutlined style="font-size: 15px" v-else class="trigger" @click="_ => collapsed = !collapsed"/>
           </div>
-          <div class="header-layout">
 
+          <div class="header-layout">
           </div>
         </div>
       </a-layout-header>
       <a-layout-content class="content-box no-scroll">
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
-        <p>Content</p>
+        <RouterView/>
       </a-layout-content>
     </a-layout>
   </a-layout>
 </template>
 <script setup>
 import {
-  UserOutlined,
   MenuOutlined,
-  MenuUnfoldOutlined,
-  VideoCameraOutlined,
-  UploadOutlined
+  MenuUnfoldOutlined
 } from '@ant-design/icons-vue';
+
 import {ref} from 'vue';
+import {useRouter} from "vue-router";
 import elementLogo from '@/assets/element-plus-logo.svg'
+import DynamicIcon from "@/components/DynamicIcon.vue";
+import {useMenusStore} from "@/stores/menus.js";
 
-
-const selectedKeys = ref(['1']);
+const selectedKeys = ref([]);
 const collapsed = ref(false);
+const router = useRouter();
+const menusStore = useMenusStore();
 </script>
 
 <style>
@@ -133,12 +97,18 @@ const collapsed = ref(false);
   flex: .5
 }
 
+.log-img {
+  width: 85px;
+  padding: 3px
+}
+
 .logo {
   height: 50px;
   background-color: #001529;
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 }
 
 .logo-text {

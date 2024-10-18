@@ -24,7 +24,6 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRoleMenu> implements SysRoleMenuService {
 
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveOrUpdateRoleMenu(Integer id, Set<Integer> menuIds) {

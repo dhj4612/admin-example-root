@@ -56,5 +56,4 @@ public class SysMenu extends BaseEntity {
      * 排序
      */
     private Integer sort;
-
 }

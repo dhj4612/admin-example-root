@@ -12,4 +12,15 @@
           AND srm.deleted = 0
           AND sur.deleted = 0
     </select>
+
+    <select id="selectMenuListByUserAndType" resultType="org.example.admin.model.entity.SysMenu">
+        SELECT sm.*
+        FROM sys_menu sm
+        JOIN sys_role_menu srm ON sm.id = srm.menu_id
+        JOIN sys_user_role sur ON srm.role_id = sur.role_id
+        WHERE sur.user_id = #{user.id} AND sm.deleted = 0 AND srm.deleted = 0 AND sur.deleted = 0
+        <if test="type != null">
+            AND sm.type = #{type}
+        </if>
+    </select>
 </mapper>

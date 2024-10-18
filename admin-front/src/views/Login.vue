@@ -53,15 +53,16 @@ const checkLogin = _ => {
 const onFinish = async values => {
   loading.value = true
   const [res, err] = await loginApi(values)
-  if (!err) {
-    const {token, refreshToken} = res
-    setAuthorization(token)
-    setRefreshAuthorization(refreshToken)
-    await router.replace('/')
-    loading.value = false
-    return
+
+  if (err) {
+    message.warning(err?.msg || '未知错误')
+    return loading.value = false
   }
-  message.warning(err?.msg || '未知错误')
+
+  const {token, refreshToken} = res
+  setAuthorization(token)
+  setRefreshAuthorization(refreshToken)
+  await router.replace('/')
   loading.value = false
 };
 
