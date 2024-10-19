@@ -1,18 +1,21 @@
 package org.example.admin.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.example.admin.mapper.SysMenuMapper;
 import org.example.admin.model.entity.SysMenu;
 import org.example.admin.model.param.MenuAddOrUpdateParam;
+import org.example.admin.model.result.SysMenuResult;
 import org.example.admin.service.SysMenuService;
 import org.example.framework.security.core.user.UserAuthorized;
+import org.example.framework.utils.TreeUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-
 
 /**
  * 菜单管理
@@ -35,6 +38,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                 .eq(SysMenu::getAuthority, param.authority())
                 .one();
         Assert.isNull(menu, "菜单名称或授权标识已存在");
+        Assert.state(!Objects.equals(param.pid(), param.id()), "上级菜单不能为自身");
 
         if (update) {
             menu = getById(param.id());
@@ -49,7 +53,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         menu.setSort(param.sort() == null ? 0 : param.sort());
         menu.setType(param.type());
         menu.setUrl(param.url());
-        menu.setPid(param.pid());
+        menu.setPid(param.pid() == null ? 0 : param.pid());
 
         saveOrUpdate(menu);
     }
@@ -57,5 +61,16 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Override
     public List<SysMenu> getUserMenuList(UserAuthorized user, Integer type) {
         return baseMapper.selectMenuListByUserAndType(user, type);
+    }
+
+    @Override
+    public List<SysMenuResult> geMenuList(Integer type) {
+        List<SysMenuResult> menuResultList = lambdaQuery()
+                .eq(type != null, SysMenu::getType, type)
+                .list()
+                .stream()
+                .map(item -> BeanUtil.toBean(item, SysMenuResult.class))
+                .toList();
+        return TreeUtil.build(menuResultList);
     }
 }

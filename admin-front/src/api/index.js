@@ -32,3 +32,5 @@ export const fetchAuthoritiesApi = _ => ApiWrapper(get('/sys/user/authorities'))
 export const fetchUserInfoApi = _ => ApiWrapper(get('/sys/user/info'))
 
 export const fetchUserMenuNavApi = _ => ApiWrapper(get('/sys/user/menu/nav'))
+
+export const fetchMenuListApi = (params = {}) => ApiWrapper(get('/sys/manager/menu/list', params))

@@ -13,7 +13,7 @@ public class TreeUtil {
         return topMenu;
     }
 
-    public static <T extends TreeNode<T>> List<T> findChildren(TreeNode<T> curr, List<T> src) {
+    private static <T extends TreeNode<T>> List<T> findChildren(TreeNode<T> curr, List<T> src) {
         final Integer id = curr.getId();
         List<T> children = src.stream().filter(item -> Objects.equals(item.getPid(), id)).toList();
         curr.setChildren(children);
