@@ -12,5 +12,5 @@ import java.util.Set;
  */
 public interface SysRoleMenuService extends IService<SysRoleMenu> {
 
-    void saveOrUpdateRoleMenu(Integer id, @NotEmpty(message = "权限列表不能为空") Set<Integer> menuIds);
+    void syncRoleMenu(Integer id, @NotEmpty(message = "权限列表不能为空") Set<Integer> menuIds);
 }

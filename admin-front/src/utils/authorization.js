@@ -16,7 +16,7 @@ export const hasRefreshAuthorization = () => !!localStorage.getItem(RefreshAutho
 export const removeAuthorization = () => localStorage.removeItem(AuthorizationKey)
 export const removeRefreshAuthorization = () => localStorage.removeItem(RefreshAuthorizationKey)
 
-export const clearAll = _ => {
+export const clearAllAuthorized = _ => {
     removeAuthorization()
     removeRefreshAuthorization()
     useUserStore().clearUserInfo()

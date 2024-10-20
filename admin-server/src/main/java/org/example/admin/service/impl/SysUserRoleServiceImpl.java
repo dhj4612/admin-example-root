@@ -26,7 +26,7 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrUpdateUserRoleRelation(SysUser sysUser, Set<Integer> roleIds) {
+    public void syncUserRole(SysUser sysUser, Set<Integer> roleIds) {
         if (CollUtil.isEmpty(roleIds)) {
             throw BizException.valueOfMsg("角色列表不能为空");
         }

@@ -23,6 +23,6 @@ public class SecurityConfiguration {
 
     @PostConstruct
     public void init() {
-        JwtUtil.init(jwtProperties, stringRedisTemplate);
+        JwtUtil.init(jwtProperties);
     }
 }

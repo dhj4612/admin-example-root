@@ -8,13 +8,10 @@ import org.example.admin.model.entity.SysRoleMenu;
 import org.example.admin.service.SysRoleMenuService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
-
 
 /**
  * 角色与菜单对应关系
@@ -26,7 +23,7 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrUpdateRoleMenu(Integer id, Set<Integer> menuIds) {
+    public void syncRoleMenu(Integer id, Set<Integer> menuIds) {
         List<Integer> roleMenuIds = lambdaQuery()
                 .eq(SysRoleMenu::getRoleId, id)
                 .list()

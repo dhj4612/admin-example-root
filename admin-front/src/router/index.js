@@ -2,7 +2,7 @@ import NProgress from 'nprogress'
 import {useUserStore} from "@/stores/user.js";
 import {useMenusStore} from "@/stores/menus.js";
 import {createRouter, createWebHistory} from 'vue-router'
-import {clearAll, hasAuthorization} from "@/utils/authorization.js";
+import {clearAllAuthorized, hasAuthorization} from "@/utils/authorization.js";
 import {pathToCamel} from "@/utils/tools.js";
 import 'nprogress/nprogress.css'
 
@@ -105,7 +105,7 @@ router.beforeEach(async (to, from) => {
             // 继续导航到目标路由
             return {...to, replace: true}
         } catch (e) {
-            clearAll()
+            clearAllAuthorized()
             return {name: 'Login'}
         }
     }

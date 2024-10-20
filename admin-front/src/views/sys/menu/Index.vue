@@ -7,17 +7,21 @@
       </template>
       <template v-if="column.dataIndex === 'operate'">
         <template v-if="record.type === 0">
-          <a-space :size="20">
+          <a-space v-auth="'admin'" :size="20">
             <a @click.prevent.stop="_ => onAddMenuClick(record.id)">新增</a>
             <a @click.prevent.stop="_ => onUpdateMenuClick(record.id,record.pid)">修改</a>
-            <a @click.prevent.stop="_ => onDeleteMenuClick(record.id)">删除</a>
+            <a-popconfirm title="Del Menu?" @confirm="onDeleteMenuClick(record.id)">
+              <a @click.prevent.stop="">删除</a>
+            </a-popconfirm>
           </a-space>
 
         </template>
         <template v-else>
-          <a-space :size="20">
-            <a @click.prevent.once.stop="_ => onUpdateMenuClick(record.id,record.pid)">修改</a>
-            <a @click.prevent.once.stop="_ => onDeleteMenuClick(record.id)">删除</a>
+          <a-space v-auth="'admin'" :size="20">
+            <a @click.prevent.stop="_ => onUpdateMenuClick(record.id,record.pid)">修改</a>
+            <a-popconfirm title="Del Menu?" @confirm="onDeleteMenuClick(record.id)">
+              <a @click.prevent.stop="">删除</a>
+            </a-popconfirm>
           </a-space>
         </template>
       </template>
@@ -29,7 +33,8 @@
       :title="addOrUpdateFormState.id ? '修改' : '新增'"
       :width="800"
       centered
-      @ok="addOrUpdateModelVisible = false">
+      :confirm-loading="modelConfirmLoading"
+      @ok="onModelConfirm">
     <div style="display: flex;justify-content: center;align-items: center">
       <a-form :model="addOrUpdateFormState"
               label-align="left"
@@ -56,7 +61,7 @@
               placeholder="Please select"
               allow-clear
               tree-default-expand-all
-              :tree-data="selectMenusData"
+              :tree-data="selectorMenusData"
               tree-node-filter-prop="label"/>
         </a-form-item>
 
@@ -74,11 +79,11 @@
           </a-radio-group>
         </a-form-item>
 
-        <a-form-item required style="width: 500px;" label="授权标识" name="authority">
+        <a-form-item style="width: 500px;" label="授权标识" name="authority">
           <a-input v-model:value="addOrUpdateFormState.authority"/>
         </a-form-item>
 
-        <a-form-item required style="width: 500px;" label="图标" name="icon">
+        <a-form-item style="width: 500px;" label="图标" name="icon">
           <a-input v-model:value="addOrUpdateFormState.icon"/>
         </a-form-item>
       </a-form>
@@ -88,11 +93,11 @@
 
 <script setup>
 import {reactive, ref} from 'vue';
-import {fetchMenuListApi} from "@/api/index.js";
+import {fetchMenuInfoApi, fetchMenuListApi, menuAddOrUpdateApi, menuDelApi} from "@/api/index.js";
 import {OpenStyleConst} from "@/utils/constant/MenuConst.js";
 import {message} from "ant-design-vue";
 import DynamicIcon from "@/components/DynamicIcon.vue";
-import {menuDataToAntTree} from "@/utils/ant-design-tools.js";
+import {treeDataConvertByNameKeys} from "@/utils/ant-design-tools.js";
 
 const columns = [
   {
@@ -142,41 +147,79 @@ const rowSelection = ref({
 
 const addOrUpdateFormRef = ref()
 const addOrUpdateFormState = reactive({})
-const selectMenusData = ref([])
+const selectorMenusData = ref([])
+const modelConfirmLoading = ref(false)
+
+const onModelConfirm = () => {
+  addOrUpdateFormRef.value.validate()
+      .then(async formState => {
+        modelConfirmLoading.value = true
+        if (addOrUpdateFormState.id) {
+          formState.id = addOrUpdateFormState.id
+        }
+        const [_, e] = await menuAddOrUpdateApi(formState)
+        if (e) {
+          message.warn(e?.msg)
+        }
+        await fetchData()
+        modelConfirmLoading.value = false
+        addOrUpdateModelVisible.value = false
+      })
+      .catch(_ => {
+      })
+}
 
 const onAddMenuClick = async (id) => {
+  Object.keys(addOrUpdateFormState).forEach(key => addOrUpdateFormState[key] = undefined)
   const [res, err] = await fetchMenuListApi({type: 0})
   if (err) {
     return message.warn(err?.msg)
   }
-  selectMenusData.value = menuDataToAntTree(res);
+  selectorMenusData.value = treeDataConvertByNameKeys(res, {
+    keyName: 'value',
+    valueName: 'label'
+  });
 
-  addOrUpdateModelVisible.value = true;
   addOrUpdateFormState.pid = id
   addOrUpdateFormState.id = undefined
+  addOrUpdateModelVisible.value = true;
 }
 
-
 const onUpdateMenuClick = async (id, pid) => {
-  // TODO fetchMenuInfo
+  const [r, e] = await fetchMenuInfoApi({id})
+  if (e) {
+    return message.warn(err?.msg)
+  }
+  Object.keys(r).forEach(key => addOrUpdateFormState[key] = r[key])
+
   const [res, err] = await fetchMenuListApi({type: 0})
   if (err) {
     return message.warn(err?.msg)
   }
-  selectMenusData.value = menuDataToAntTree(res);
+  selectorMenusData.value = treeDataConvertByNameKeys(res, {
+    keyName: 'value',
+    valueName: 'label'
+  });
 
-  addOrUpdateModelVisible.value = true;
   addOrUpdateFormState.id = id
   addOrUpdateFormState.pid = pid === 0 ? undefined : pid
+  addOrUpdateModelVisible.value = true;
 }
-const onDeleteMenuClick = (id) => {
 
+const onDeleteMenuClick = async (id) => {
+  const [_, e] = await menuDelApi({id})
+  if (e) {
+    message.warn(e?.msg)
+    return Promise.reject()
+  }
+  await fetchData()
+  return Promise.resolve()
 }
 
 const fetchData = async _ => {
   const [res, err] = await fetchMenuListApi()
   if (!err) {
-    data.value = res
+    data.value = treeDataConvertByNameKeys(res, {valueName: 'name'});
     return
   }
   message.warn(err?.msg)

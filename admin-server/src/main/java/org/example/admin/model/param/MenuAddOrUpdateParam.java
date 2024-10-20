@@ -11,5 +11,6 @@ public record MenuAddOrUpdateParam(
         String authority,
         @NotNull(message = "菜单类型不能为空") Integer type,
         @NotNull(message = "打开方式不能为空") Integer openStyle,
-        Integer sort) {
+        Integer sort,
+        String icon) {
 }

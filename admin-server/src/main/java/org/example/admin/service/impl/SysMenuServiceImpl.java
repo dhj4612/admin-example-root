@@ -5,17 +5,23 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.example.admin.mapper.SysMenuMapper;
 import org.example.admin.model.entity.SysMenu;
+import org.example.admin.model.entity.SysRoleMenu;
+import org.example.admin.model.event.SyncUserRoleAuthorityEvent;
 import org.example.admin.model.param.MenuAddOrUpdateParam;
+import org.example.admin.model.param.MenuDelParam;
 import org.example.admin.model.result.SysMenuResult;
 import org.example.admin.service.SysMenuService;
+import org.example.admin.service.SysRoleMenuService;
+import org.example.framework.common.exception.BizException;
 import org.example.framework.security.core.user.UserAuthorized;
 import org.example.framework.utils.TreeUtil;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * 菜单管理
@@ -25,25 +31,33 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> implements SysMenuService {
 
-    @Override
-    public Set<String> getUserAuthsByUsrId(Integer id) {
-        return baseMapper.selectAuthorityListByUserId(id);
-    }
+    private final SysRoleMenuService sysRoleMenuService;
+    private final ApplicationEventPublisher publisher;
 
     @Override
     public void addOrUpdateMenu(MenuAddOrUpdateParam param) {
         final boolean update = param.id() != null;
-        SysMenu menu = lambdaQuery().eq(SysMenu::getName, param.name())
-                .or()
-                .eq(SysMenu::getAuthority, param.authority())
-                .one();
-        Assert.isNull(menu, "菜单名称或授权标识已存在");
+        SysMenu menu;
         Assert.state(!Objects.equals(param.pid(), param.id()), "上级菜单不能为自身");
 
         if (update) {
             menu = getById(param.id());
             Assert.notNull(menu, "菜单不存在");
+            if (!Objects.equals(menu.getName(), param.name())
+                    || !Objects.equals(menu.getAuthority(), param.authority())) {
+                Assert.isNull(
+                        lambdaQuery().eq(SysMenu::getName, param.name())
+                                .or()
+                                .eq(SysMenu::getAuthority, param.authority())
+                                .one()
+                        , "菜单名称或授权标识已存在");
+            }
         } else {
+            menu = lambdaQuery().eq(SysMenu::getName, param.name())
+                    .or()
+                    .eq(SysMenu::getAuthority, param.authority())
+                    .one();
+            Assert.isNull(menu, "菜单名称或授权标识已存在");
             menu = new SysMenu();
         }
 
@@ -52,6 +66,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         menu.setOpenStyle(param.openStyle());
         menu.setSort(param.sort() == null ? 0 : param.sort());
         menu.setType(param.type());
+        menu.setIcon(param.icon());
         menu.setUrl(param.url());
         menu.setPid(param.pid() == null ? 0 : param.pid());
 
@@ -67,10 +82,27 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     public List<SysMenuResult> geMenuList(Integer type) {
         List<SysMenuResult> menuResultList = lambdaQuery()
                 .eq(type != null, SysMenu::getType, type)
+                .orderByAsc(SysMenu::getSort)
                 .list()
                 .stream()
                 .map(item -> BeanUtil.toBean(item, SysMenuResult.class))
                 .toList();
         return TreeUtil.build(menuResultList);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void delMenu(MenuDelParam param) {
+        if (lambdaQuery().eq(SysMenu::getPid, param.id()).exists()) {
+            throw BizException.valueOfMsg("请先删除子菜单");
+        }
+        removeById(param.id());
+
+        // 删除角色 & 菜单关系
+        sysRoleMenuService.lambdaUpdate()
+                .eq(SysRoleMenu::getMenuId, param.id())
+                .remove();
+
+        publisher.publishEvent(new SyncUserRoleAuthorityEvent());
     }
 }

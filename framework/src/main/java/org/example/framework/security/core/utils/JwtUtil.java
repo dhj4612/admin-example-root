@@ -12,7 +12,7 @@ import org.example.framework.common.exception.BizException;
 import org.example.framework.security.config.JwtProperties;
 import org.example.framework.security.core.user.UserAuthorized;
 import org.example.framework.utils.AesUtil;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.example.framework.utils.RedisUtil;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -24,15 +24,13 @@ import java.util.concurrent.TimeUnit;
 public class JwtUtil {
     private static JWTVerifier Verifier;
     private static JwtProperties JwtProperties;
-    private static StringRedisTemplate StringRedisTemplate;
 
-    public static void init(JwtProperties jwtProperties, StringRedisTemplate stringRedisTemplate) {
+    public static void init(JwtProperties jwtProperties) {
         Algorithm algorithm = Algorithm.HMAC256(jwtProperties.getSecret().getBytes());
         Verifier = JWT.require(algorithm)
                 .withIssuer("com.example.dhj")
                 .build();
         JwtProperties = jwtProperties;
-        StringRedisTemplate = stringRedisTemplate;
 
         log.info("JwtUtil init complete......");
     }
@@ -55,7 +53,7 @@ public class JwtUtil {
                 .withIssuer("com.example.dhj")
                 .withExpiresAt(DateUtils.addMilliseconds(new Date(), JwtProperties.getExpire()))
                 .sign(Algorithm.HMAC256(JwtProperties.getSecret().getBytes()));
-        StringRedisTemplate.opsForValue().set(
+        RedisUtil.StringRedisTemplate.opsForValue().set(
                 "login:session:" + encryptUserId,
                 JSONUtil.toJsonStr(userAuthorized),
                 JwtProperties.getExpire(),
@@ -92,7 +90,7 @@ public class JwtUtil {
 
     public static UserAuthorized verifyJwtStrAndGetForCache(String jwtStr) {
         DecodedJWT jwt = verifyJwtStr(jwtStr);
-        String value = StringRedisTemplate.opsForValue().get("login:session:" + jwt.getId());
+        String value = RedisUtil.StringRedisTemplate.opsForValue().get("login:session:" + jwt.getId());
         if (StringUtils.isBlank(value) || !JSONUtil.isTypeJSON(value)) {
             throw BizException.valueOfMsg("用户授权令牌非法或已过期");
         }

@@ -47,13 +47,11 @@ public class UserController {
 
     @GetMapping("/authorities")
     public Result<Set<String>> authorities() {
-        return Result.ok(sysUserService.getUserAuthorities());
+        return Result.ok(sysUserService.getUserAuthoritiesAndRoles());
     }
 
     @GetMapping("/menu/nav")
     public Result<List<SysMenuResult>> menuNav() {
         return Result.ok(sysUserService.getUserMenuNav());
     }
-
-
 }
