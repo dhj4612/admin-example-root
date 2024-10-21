@@ -8,7 +8,7 @@
                     collapsible>
       <div class="logo" @click="router.push('/')">
         <img class="log-img" :src="elementLogo" alt="...">
-        <p class="logo-text">Admin</p>
+        <p class="logo-text">MyAdmin</p>
       </div>
       <a-menu v-model:selectedKeys="selectedKeys"
               @click="item => item?.item?.path && router.push(item.item.path)"

@@ -31,7 +31,10 @@ export function useTable({
                              fetchApi = () => Promise.resolve([[], null]),
                              dataHandler = DefaultDataHandler,
                              searchParams = {},
-                             option = {},
+                             option = {
+                                 pageNumberKeyName: 'current',
+                                 pageSizeKeyName: 'pageSize'
+                             },
                              handlerErr = DefaultErrHandler
                          }) {
     const dataSource = ref([])
@@ -66,7 +69,9 @@ export function useTable({
         loading.value = true
         const searchParam = toRaw(searchFormState)
         const [res, err] = await fetchApi({
-            ...searchParam, pn: pagination.current, ps: pagination.pageSize
+            ...searchParam,
+            [option.pageNumberKeyName]: pagination.current,
+            [option.pageSizeKeyName]: pagination.pageSize
         })
         if (err) {
             return DefaultErrHandler(err)

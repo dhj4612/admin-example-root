@@ -1,6 +1,7 @@
 import axios from 'axios'
-import {getAuthorization, hasAuthorization} from '@/utils/authorization.js'
+import {clearAllAuthorized, getAuthorization, hasAuthorization} from '@/utils/authorization.js'
 import {AuthorizationKey} from "./authorization.js";
+import {useRouter} from "vue-router";
 
 const instance = axios.create({
     baseURL: '/api', timeout: 30000,
@@ -21,6 +22,11 @@ instance.interceptors.response.use(
         const {status, data} = response
         if (status === 200 && (data?.code.toString() === '200')) {
             return Promise.resolve(data?.data || {})
+        }
+        if (status === 401 || data?.code === '401') {
+            clearAllAuthorized()
+            useRouter().replace('/login')
+            return Promise.reject()
         }
         return Promise.reject(response?.data)
     },

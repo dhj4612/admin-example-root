@@ -43,3 +43,4 @@ export const menuAddOrUpdateApi = (data = {}) => ApiWrapper(post('/sys/manager/m
 
 export const menuDelApi = (data = {}) => ApiWrapper(post('/sys/manager/menu/del', data))
 
+export const fetchRoleListApi = (data = {}) => ApiWrapper(post('/sys/manager/role/list', data))

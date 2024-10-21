@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.function.Supplier;
 
 @Data
 public final class BasePageResult<T> implements Serializable {
@@ -42,6 +43,16 @@ public final class BasePageResult<T> implements Serializable {
         this.pageTotal = page.getPages();
         this.total = page.getTotal();
         this.records = page.getRecords();
+    }
+
+    public static <S, T> BasePageResult<T> ofPage(IPage<S> page, Supplier<List<T>> converter) {
+        BasePageResult<T> pageResult = new BasePageResult<>();
+        pageResult.setCurrent(page.getCurrent());
+        pageResult.setPageSize(page.getSize());
+        pageResult.setPageTotal(page.getPages());
+        pageResult.setTotal(page.getTotal());
+        pageResult.setRecords(converter.get());
+        return pageResult;
     }
 
     public BasePageResult(Long page, Long pageSize, Long total, Long pageTotal, List<T> records) {

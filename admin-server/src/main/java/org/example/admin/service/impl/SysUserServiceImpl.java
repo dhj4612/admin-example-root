@@ -1,6 +1,7 @@
 package org.example.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.example.admin.mapper.SysUserMapper;
@@ -59,14 +60,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             Assert.notNull(sysUser, "用户不存在或已禁用");
             Assert.state(!Objects.equals(sysUser.getSuperAdmin(), 1), "管理员账户不能修改");
 
-            if (!Objects.equals(sysUser.getMobile(), param.phone()) ||
-                    !Objects.equals(sysUser.getUsername(), param.username())) {
-                Assert.isNull(lambdaQuery()
-                        .eq(SysUser::getMobile, DbEncryptHelper.encrypt(param.phone()))
-                        .or()
-                        .eq(SysUser::getUsername, param.username())
-                        .one(), "手机号或用户名已存在");
+            LambdaQueryChainWrapper<SysUser> condition = lambdaQuery();
+            if (!Objects.equals(sysUser.getMobile(), param.phone())) {
+                condition.eq(SysUser::getMobile, param.phone());
             }
+            if (!Objects.equals(sysUser.getUsername(), param.username())) {
+                condition.or().eq(SysUser::getUsername, param.username());
+            }
+            Assert.state(!condition.exists(), "手机号或用户名已存在");
         } else {
             Assert.isNull(lambdaQuery()
                     .eq(SysUser::getMobile, DbEncryptHelper.encrypt(param.phone()))

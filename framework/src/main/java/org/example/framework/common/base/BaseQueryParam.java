@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Setter
 @ToString
-public class BaseQuery implements Serializable {
+public class BaseQueryParam implements Serializable {
     /**
      * 当前页
      */

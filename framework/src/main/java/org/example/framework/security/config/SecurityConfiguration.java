@@ -3,6 +3,7 @@ package org.example.framework.security.config;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.example.framework.security.core.utils.JwtUtil;
+import org.example.framework.security.core.utils.SecurityExpressions;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -19,6 +20,11 @@ public class SecurityConfiguration {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Bean("se")
+    public SecurityExpressions securityExpressions() {
+        return new SecurityExpressions();
     }
 
     @PostConstruct

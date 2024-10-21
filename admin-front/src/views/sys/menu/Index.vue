@@ -1,5 +1,5 @@
 <template>
-  <a-table :columns="columns" :data-source="data" :row-selection="rowSelection">
+  <a-table :columns="columns" :data-source="tableData" :row-selection="rowSelection">
     <template #bodyCell="{column, text, record}">
       <template v-if="column.dataIndex === 'icon'">
         <DynamicIcon v-if="text" :type="text"/>
@@ -7,20 +7,23 @@
       </template>
       <template v-if="column.dataIndex === 'operate'">
         <template v-if="record.type === 0">
-          <a-space v-auth="'admin'" :size="20">
-            <a @click.prevent.stop="_ => onAddMenuClick(record.id)">新增</a>
-            <a @click.prevent.stop="_ => onUpdateMenuClick(record.id,record.pid)">修改</a>
+          <a-space :size="20">
+            <a v-auth="['sys:menu:add','sys:menu:update','sys:role:info']"
+               @click.prevent.stop="_ => onAddMenuClick(record.id)">新增</a>
+            <a v-auth="['sys:menu:add','sys:menu:update','sys:role:info']"
+               @click.prevent.stop="_ => onUpdateMenuClick(record.id,record.pid)">修改</a>
             <a-popconfirm title="Del Menu?" @confirm="onDeleteMenuClick(record.id)">
-              <a @click.prevent.stop="">删除</a>
+              <a v-auth="'sys:menu:del'" @click.prevent.stop="">删除</a>
             </a-popconfirm>
           </a-space>
 
         </template>
         <template v-else>
           <a-space v-auth="'admin'" :size="20">
-            <a @click.prevent.stop="_ => onUpdateMenuClick(record.id,record.pid)">修改</a>
+            <a v-auth="['sys:menu:add','sys:menu:update','sys:role:info']"
+               @click.prevent.stop="_ => onUpdateMenuClick(record.id,record.pid)">修改</a>
             <a-popconfirm title="Del Menu?" @confirm="onDeleteMenuClick(record.id)">
-              <a @click.prevent.stop="">删除</a>
+              <a v-auth="'sys:menu:del'" @click.prevent.stop="">删除</a>
             </a-popconfirm>
           </a-space>
         </template>
@@ -131,7 +134,7 @@ const columns = [
   }
 ];
 const addOrUpdateModelVisible = ref(false);
-const data = ref([]);
+const tableData = ref([]);
 const rowSelection = ref({
   checkStrictly: false,
   onChange: (selectedRowKeys, selectedRows) => {
@@ -219,7 +222,7 @@ const onDeleteMenuClick = async (id) => {
 const fetchData = async _ => {
   const [res, err] = await fetchMenuListApi()
   if (!err) {
-    data.value = treeDataConvertByNameKeys(res, {valueName: 'name'});
+    tableData.value = treeDataConvertByNameKeys(res, {valueName: 'name'});
     return
   }
   message.warn(err?.msg)

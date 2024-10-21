@@ -1,5 +1,22 @@
+import dayjs from "dayjs"; // https://day.js.org/zh-CN/
 
+/**
+ * 格式化时间 YYYY_MM_DD_HH_mm_ss
+ * @param date
+ * @return {*}
+ */
+export function yyyy_mm_dd_hh_mm_ss(date) {
+    return date ? dayjs(date).format('YYYY-MM-DD HH:mm:ss') : ''
+}
 
+/**
+ * 格式化时间 YYYY_MM_DD
+ * @param date
+ * @return {string|string}
+ */
+export function yyyy_mm_dd(date) {
+    return date ? dayjs(date).format('YYYY-MM-DD') : ''
+}
 
 /**
  * 防抖函数，固定时间段内，多次触发只执行最后一次
