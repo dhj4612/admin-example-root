@@ -10,7 +10,6 @@ import org.example.admin.model.result.SysRoleResult;
 import org.example.admin.service.SysMenuService;
 import org.example.admin.service.SysRoleService;
 import org.example.framework.common.base.BasePageResult;
-import org.example.framework.common.base.BaseQueryParam;
 import org.example.framework.common.base.Result;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
