@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.example.admin.mapper.SysRoleMapper;
 import org.example.admin.model.entity.SysRole;
-import org.example.admin.model.entity.SysRoleMenu;
 import org.example.admin.model.entity.SysUserRole;
 import org.example.admin.model.event.SyncUserRoleAuthorityEvent;
 import org.example.admin.model.param.RoleAddOrUpdateParam;
@@ -27,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * 角色
@@ -115,13 +113,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             throw BizException.valueOfMsg("角色不存在");
         }
         SysRoleInfoResult sysRoleResult = BeanUtil.copyProperties(sysRole, SysRoleInfoResult.class);
-        // TODO 过滤出没有子节点的 menuId 即最小一级的 menu
-        sysRoleResult.setMenuIds(sysRoleMenuService.lambdaQuery()
-                .eq(SysRoleMenu::getRoleId, param.id())
-                .list()
-                .stream()
-                .map(SysRoleMenu::getMenuId)
-                .collect(Collectors.toSet()));
+        // 查询出没有子节点的 menuId 即最小一级的 menu
+        sysRoleResult.setMenuIds(sysRoleMenuService.getLowestMenuIdsByRoleId(sysRole.getId()));
         return sysRoleResult;
     }
 }

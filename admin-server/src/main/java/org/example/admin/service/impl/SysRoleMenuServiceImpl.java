@@ -51,4 +51,9 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
                     .remove();
         }
     }
+
+    @Override
+    public Set<Integer> getLowestMenuIdsByRoleId(Integer roleId) {
+        return baseMapper.selectLowestMenuIdsByRoleId(roleId);
+    }
 }
