@@ -24,6 +24,13 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void syncRoleMenu(Integer id, Set<Integer> menuIds) {
+        if (menuIds.isEmpty()) {
+            lambdaUpdate()
+                    .eq(SysRoleMenu::getRoleId, id)
+                    .remove();
+            return;
+        }
+
         List<Integer> roleMenuIds = lambdaQuery()
                 .eq(SysRoleMenu::getRoleId, id)
                 .list()
@@ -36,9 +43,12 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
                 .toList();
         saveBatch(roleMenuList);
 
-        lambdaUpdate()
-                .eq(SysRoleMenu::getRoleId, id)
-                .in(SysRoleMenu::getMenuId, CollUtil.subtract(roleMenuIds, menuIds))
-                .remove();
+        Collection<Integer> removeMenuIds = CollUtil.subtract(roleMenuIds, menuIds);
+        if (CollUtil.isNotEmpty(removeMenuIds)) {
+            lambdaUpdate()
+                    .eq(SysRoleMenu::getRoleId, id)
+                    .in(SysRoleMenu::getMenuId, removeMenuIds)
+                    .remove();
+        }
     }
 }

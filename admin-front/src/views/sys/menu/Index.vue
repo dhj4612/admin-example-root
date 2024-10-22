@@ -162,7 +162,7 @@ const onModelConfirm = () => {
         }
         const [_, e] = await menuAddOrUpdateApi(formState)
         if (e) {
-          message.warn(e?.msg)
+          message.warn(e.msg)
         }
         await fetchData()
         modelConfirmLoading.value = false
@@ -191,13 +191,13 @@ const onAddMenuClick = async (id) => {
 const onUpdateMenuClick = async (id, pid) => {
   const [r, e] = await fetchMenuInfoApi({id})
   if (e) {
-    return message.warn(err?.msg)
+    return message.warn(e.msg)
   }
   Object.keys(r).forEach(key => addOrUpdateFormState[key] = r[key])
 
   const [res, err] = await fetchMenuListApi({type: 0})
   if (err) {
-    return message.warn(err?.msg)
+    return message.warn(err.msg)
   }
   selectorMenusData.value = treeDataConvertByNameKeys(res, {
     keyName: 'value',
@@ -212,7 +212,7 @@ const onUpdateMenuClick = async (id, pid) => {
 const onDeleteMenuClick = async (id) => {
   const [_, e] = await menuDelApi({id})
   if (e) {
-    message.warn(e?.msg)
+    message.warn(e.msg)
     return Promise.reject()
   }
   await fetchData()
@@ -221,11 +221,10 @@ const onDeleteMenuClick = async (id) => {
 
 const fetchData = async _ => {
   const [res, err] = await fetchMenuListApi()
-  if (!err) {
-    tableData.value = treeDataConvertByNameKeys(res, {valueName: 'name'});
-    return
+  if (err) {
+    return message.warn(err.msg)
   }
-  message.warn(err?.msg)
+  tableData.value = treeDataConvertByNameKeys(res, {valueName: 'name'});
 }
 
 fetchData()

@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -116,6 +115,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             throw BizException.valueOfMsg("角色不存在");
         }
         SysRoleInfoResult sysRoleResult = BeanUtil.copyProperties(sysRole, SysRoleInfoResult.class);
+        // TODO 过滤出没有子节点的 menuId 即最小一级的 menu
         sysRoleResult.setMenuIds(sysRoleMenuService.lambdaQuery()
                 .eq(SysRoleMenu::getRoleId, param.id())
                 .list()

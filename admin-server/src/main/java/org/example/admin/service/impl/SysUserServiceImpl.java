@@ -8,6 +8,7 @@ import org.example.admin.mapper.SysUserMapper;
 import org.example.admin.model.entity.SysMenu;
 import org.example.admin.model.entity.SysRole;
 import org.example.admin.model.entity.SysUser;
+import org.example.admin.model.event.SyncUserRoleAuthorityEvent;
 import org.example.admin.model.param.UserPhoneLoginParam;
 import org.example.admin.model.param.UserSaveOrUpdateParam;
 import org.example.admin.model.result.SysMenuResult;
@@ -26,6 +27,7 @@ import org.example.framework.security.core.utils.JwtUtil;
 import org.example.framework.utils.AesUtil;
 import org.example.framework.utils.RedisUtil;
 import org.example.framework.utils.TreeUtil;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +49,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private final SysMenuService sysMenuService;
     private final SysUserRoleService sysUserRoleService;
     private final SysRoleService sysRoleService;
+    private final ApplicationEventPublisher publisher;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -86,6 +89,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         saveOrUpdate(sysUser);
 
         sysUserRoleService.syncUserRole(sysUser, param.roleIds());
+
+        publisher.publishEvent(new SyncUserRoleAuthorityEvent());
     }
 
     @Override

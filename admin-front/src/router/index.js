@@ -9,7 +9,12 @@ import 'nprogress/nprogress.css'
 const asyncRoutes = {
     path: '/',
     component: _ => import('@/views/Index.vue'),
-    children: []
+    children: [
+        {
+            path:'',
+            component: _ => import('@/views/home/Index.vue')
+        }
+    ]
 }
 
 const router = createRouter({

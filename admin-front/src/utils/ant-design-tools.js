@@ -17,3 +17,7 @@ export const treeDataConvertByNameKeys = (treeData, {
         }
     });
 }
+
+export const collectFullPathTreeIds = (currNodeId, src) => {
+
+}
