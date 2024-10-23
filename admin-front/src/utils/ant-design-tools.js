@@ -18,6 +18,24 @@ export const treeDataConvertByNameKeys = (treeData, {
     });
 }
 
-export const collectFullPathTreeIds = (currNodeId, src) => {
+export const deepFindNodeById = (id, src) => {
+    for (let i = 0; i < src.length; i++) {
+        if (src[i].id === id) {
+            return src[i]
+        }
+        if (src[i].children && src[i].children.length) {
+            return deepFindNodeById(id, src[i].children)
+        }
+    }
+}
 
+export const collectFullPathTreeIds = (id, src) => {
+    const fullIds = [id]
+    const currentNode = deepFindNodeById(id, src)
+    if (currentNode) {
+        if (currentNode.pid !== 0) {
+            fullIds.push(...collectFullPathTreeIds(currentNode.pid, src))
+        }
+    }
+    return fullIds
 }

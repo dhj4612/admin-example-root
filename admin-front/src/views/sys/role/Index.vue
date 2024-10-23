@@ -11,10 +11,13 @@
       :pagination="pagination"
       @change="handleTableChange">
     <template #bodyCell="{column, text, record}">
-      <template v-if="column === 'operate'">
+      <template v-if="column.dataIndex === 'operate'">
         <a-space :size="20">
-          <a @click.prevent.stop="onUpdateClick(column.id)">修改</a>
-          <a @click.prevent.stop="onDeleteClick(column.id)">删除</a>
+          <a v-auth="['sys:role:add','sys:role:update','sys:role:info']"
+             @click.prevent.stop="onUpdateClick(record.id)">修改</a>
+          <a-popconfirm title="Del Role?" @confirm="onDeleteClick(record.id)">
+            <a v-auth="'sys:role:del'" @click.prevent.stop="">删除</a>
+          </a-popconfirm>
         </a-space>
       </template>
     </template>
@@ -23,15 +26,17 @@
   <AddOrUpdate :open="addOrUpdateModelOpen"
                :update-id="updateId"
                @onModelClose="_ => addOrUpdateModelOpen = false"
+               @onRefresh="fetchTableData"
   />
 </template>
 
 <script setup>
 import {yyyy_mm_dd_hh_mm_ss} from "@/utils/tools.js";
-import {fetchRoleListApi} from "@/api/index.js";
+import {fetchRoleListApi, roleDelApi} from "@/api/index.js";
 import {useTable} from "@/hooks/useTable.js";
 import AddOrUpdate from "@/views/sys/role/component/AddOrUpdate.vue";
 import {ref} from "vue";
+import {message} from "ant-design-vue";
 
 const columns = [
   {
@@ -83,8 +88,14 @@ const onUpdateClick = id => {
   addOrUpdateModelOpen.value = true
 }
 
-const onDeleteClick = id => {
-
+const onDeleteClick = async id => {
+  const [_, e] = await roleDelApi({id})
+  if (e) {
+    message.warn(e.msg)
+    return Promise.reject()
+  }
+  await fetchTableData()
+  return Promise.resolve()
 }
 
 fetchTableData()

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.example.admin.mapper.SysRoleMapper;
 import org.example.admin.model.entity.SysRole;
+import org.example.admin.model.entity.SysRoleMenu;
 import org.example.admin.model.entity.SysUserRole;
 import org.example.admin.model.event.SyncUserRoleAuthorityEvent;
 import org.example.admin.model.param.RoleAddOrUpdateParam;
@@ -48,26 +49,30 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             sysRole = getById(param.id());
             Assert.notNull(sysRole, "角色不存在或已禁用");
 
+            boolean change = false;
             LambdaQueryChainWrapper<SysRole> condition = lambdaQuery();
             if (!Objects.equals(sysRole.getName(), param.name())) {
                 condition.eq(SysRole::getName, param.name());
-
+                change = true;
             }
-            if (!Objects.equals(sysRole.getRoleCode(), param.code())) {
-                condition.or().eq(SysRole::getRoleCode, param.code());
+            if (!Objects.equals(sysRole.getRoleCode(), param.roleCode())) {
+                condition.or().eq(SysRole::getRoleCode, param.roleCode());
+                change = true;
             }
-            Assert.state(!condition.exists(), "角色名称或角色编码已存在");
+            if (change) {
+                Assert.state(!condition.exists(), "角色名称或角色编码已存在");
+            }
         } else {
             sysRole = lambdaQuery()
                     .eq(SysRole::getName, param.name())
                     .or()
-                    .eq(SysRole::getRoleCode, param.code())
+                    .eq(SysRole::getRoleCode, param.roleCode())
                     .one();
             Assert.isNull(sysRole, "角色名称或角色编码已存在");
             sysRole = new SysRole();
         }
         sysRole.setName(param.name());
-        sysRole.setRoleCode(param.code());
+        sysRole.setRoleCode(param.roleCode());
         sysRole.setRemark(param.remark());
 
         saveOrUpdate(sysRole);
@@ -75,7 +80,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         sysRoleMenuService.syncRoleMenu(sysRole.getId(), param.menuIds());
 
         // 异步同步已登录用户角色权限
-        publisher.publishEvent(new SyncUserRoleAuthorityEvent());
+        if (update) {
+            publisher.publishEvent(new SyncUserRoleAuthorityEvent());
+        }
     }
 
     @Override
@@ -83,9 +90,14 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     public void delRole(RoleDelParam param) {
         removeById(param.id());
 
-        // 更新用户 & 角色关系
+        // 删除用户 & 角色关系
         sysUserRoleService.lambdaUpdate()
                 .eq(SysUserRole::getRoleId, param.id())
+                .remove();
+
+        // 删除角色 & 菜单关系
+        sysRoleMenuService.lambdaUpdate()
+                .eq(SysRoleMenu::getRoleId, param.id())
                 .remove();
 
         // 异步同步已登录用户角色权限

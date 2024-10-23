@@ -48,3 +48,5 @@ export const fetchRoleListApi = (data = {}) => ApiWrapper(post('/sys/manager/rol
 export const fetchRoleInfoApi = (data = {}) => ApiWrapper(post('/sys/manager/role/info', data))
 
 export const addOrUpdateRoleApi = (data = {}) => ApiWrapper(post('/sys/manager/role-add-or-update', data))
+
+export const roleDelApi = (data = {}) => ApiWrapper(post('/sys/manager/role/del', data))

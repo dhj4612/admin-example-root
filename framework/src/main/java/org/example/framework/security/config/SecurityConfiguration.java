@@ -6,15 +6,12 @@ import org.example.framework.security.core.utils.JwtUtil;
 import org.example.framework.security.core.utils.SecurityExpressions;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RequiredArgsConstructor
 @EnableConfigurationProperties({XssProperties.class, JwtProperties.class})
 public class SecurityConfiguration {
-
-    private final StringRedisTemplate stringRedisTemplate;
     private final JwtProperties jwtProperties;
 
     @Bean

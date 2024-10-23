@@ -17,8 +17,8 @@
         <a-form-item required label="名称" name="name">
           <a-input v-model:value="addOrUpdateFormState.name"/>
         </a-form-item>
-        <a-form-item required label="编码" name="code">
-          <a-input v-model:value="addOrUpdateFormState.code"/>
+        <a-form-item required label="编码" name="roleCode">
+          <a-input v-model:value="addOrUpdateFormState.roleCode"/>
         </a-form-item>
 
         <a-form-item label="备注" name="remark">
@@ -43,10 +43,11 @@
 </template>
 
 <script setup>
-import {reactive, ref, watch} from "vue";
+import {reactive, ref, toRaw, watch} from "vue";
 import {message, TreeSelect} from "ant-design-vue";
 import {addOrUpdateRoleApi, fetchMenuListApi, fetchRoleInfoApi} from "@/api/index.js";
 import {collectFullPathTreeIds, treeDataConvertByNameKeys} from "@/utils/ant-design-tools.js";
+import _lodash from 'lodash';
 
 const props = defineProps({
   open: {
@@ -59,7 +60,7 @@ const props = defineProps({
   }
 })
 
-const emits = defineEmits(['onModelOk', 'onModelClose']);
+const emits = defineEmits(['onModelOk', 'onModelClose', 'onRefresh']);
 
 const modelConfirmLoading = ref(false)
 const onModelConfirm = async () => {
@@ -72,13 +73,13 @@ const onModelConfirm = async () => {
         if (!formState.menuIds) {
           formState.menuIds = []
         }
-        console.log(formState)
-        // const [_, e] = await addOrUpdateRoleApi(formState)
-        // if (e) {
-        //   message.warn(e.msg)
-        // }
-        // modelConfirmLoading.value = false
-        // emits('onModelClose')
+        const [_, e] = await addOrUpdateRoleApi(formState)
+        if (e) {
+          message.warn(e.msg)
+        }
+        modelConfirmLoading.value = false
+        emits('onModelClose')
+        emits('onRefresh')
       })
       .catch(_ => {
       })
@@ -89,19 +90,24 @@ const addOrUpdateFormState = reactive({})
 const addOrUpdateFormRef = ref()
 
 const selectorMenusData = ref([]);
-const selectMenuIds = ref([]);
+let fullSelectMenuIds = undefined;
 
-// 收集
 watch(_ => addOrUpdateFormState.menuIds, _ => {
-  // TODO 查找当前选择的节点的完整父级 id 集合，使用 Set 过滤共同的父级
-  // if (addOrUpdateFormState.menuIds || addOrUpdateFormState.menuIds.length > 0) {
-  //   const src = JSON.parse(JSON.stringify(addOrUpdateFormState.menuIds))
-  //   const menuIds = new Set(src)
-  //   const collectIds = addOrUpdateFormState.menuIds.map(menuId => {
-  //
-  //   });
-  //   addOrUpdateFormState.menuIds.push(...collectIds)
-  // }
+  // 收集当前选择的节点的完整父级 id 集合，使用 Set 过滤共同的父级
+  if (addOrUpdateFormState.menuIds) {
+    if (!addOrUpdateFormState.menuIds.length) {
+      fullSelectMenuIds = []
+      return
+    }
+
+    const _menuIds = _lodash.cloneDeep(toRaw(addOrUpdateFormState.menuIds))
+    const src = _lodash.cloneDeep(toRaw(selectorMenusData.value))
+    const collectFullIds = _menuIds.map(menuId => {
+      return collectFullPathTreeIds(menuId, src)
+    }).flatMap(id => id);
+    fullSelectMenuIds = new Set(collectFullIds)
+    console.log(fullSelectMenuIds)
+  }
 })
 
 watch(_ => props.open, async _ => {
