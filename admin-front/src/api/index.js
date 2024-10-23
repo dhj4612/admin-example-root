@@ -43,6 +43,8 @@ export const menuAddOrUpdateApi = (data = {}) => ApiWrapper(post('/sys/manager/m
 
 export const menuDelApi = (data = {}) => ApiWrapper(post('/sys/manager/menu/del', data))
 
+export const fetchRolePageApi = (data = {}) => ApiWrapper(post('/sys/manager/role/page', data))
+
 export const fetchRoleListApi = (data = {}) => ApiWrapper(post('/sys/manager/role/list', data))
 
 export const fetchRoleInfoApi = (data = {}) => ApiWrapper(post('/sys/manager/role/info', data))
@@ -51,7 +53,7 @@ export const addOrUpdateRoleApi = (data = {}) => ApiWrapper(post('/sys/manager/r
 
 export const roleDelApi = (data = {}) => ApiWrapper(post('/sys/manager/role/del', data))
 
-export const fetchUserListApi = (data = {}) => ApiWrapper(post('/sys/user/list', data))
+export const fetchUserPageApi = (data = {}) => ApiWrapper(post('/sys/user/page', data))
 
 export const fetchUserUpdateInfoApi = (data = {}) => ApiWrapper(post('/sys/user/update-info', data))
 

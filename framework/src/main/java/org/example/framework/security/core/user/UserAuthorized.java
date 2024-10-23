@@ -17,6 +17,8 @@ public class UserAuthorized {
     private Integer id;
     private boolean superAdmin;
 
+    // TODO 用户账户状态
+
     // 存放用户权限标识和角色标识的集合
     private Set<String> authorities;
     private Set<String> roles;

@@ -11,6 +11,7 @@ import org.example.admin.service.SysMenuService;
 import org.example.admin.service.SysRoleService;
 import org.example.framework.common.base.BasePageResult;
 import org.example.framework.common.base.Result;
+import org.example.framework.idempotent.core.NoDuplicateSubmit;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,7 @@ public class SysManagerController {
 
     @PostMapping("/menu-add-or-update")
     @PreAuthorize("@se.hasAllAuthorities('sys:menu:add','sys:menu:update','sys:role:info')")
+    @NoDuplicateSubmit
     public Result<Void> addOrUpdateMenu(@RequestBody @Valid MenuAddOrUpdateParam param) {
         sysMenuService.addOrUpdateMenu(param);
         return Result.ok();
@@ -51,14 +53,21 @@ public class SysManagerController {
 
     @PostMapping("/role-add-or-update")
     @PreAuthorize("@se.hasAllAuthorities('sys:role:add','sys:role:update','sys:role:info')")
+    @NoDuplicateSubmit
     public Result<Void> addOrUpdateRole(@RequestBody @Valid RoleAddOrUpdateParam param) {
         sysRoleService.addOrUpdateRole(param);
         return Result.ok();
     }
 
+    @PostMapping("/role/page")
+    @PreAuthorize("@se.hasAuthorities('sys:role:list')")
+    public Result<BasePageResult<SysRoleResult>> rolePage(@RequestBody RoleListQueryParam param) {
+        return Result.ok(sysRoleService.rolePage(param));
+    }
+
     @PostMapping("/role/list")
     @PreAuthorize("@se.hasAuthorities('sys:role:list')")
-    public Result<BasePageResult<SysRoleResult>> roleList(@RequestBody RoleListQueryParam param) {
+    public Result<List<SysRoleResult>> roleList(@RequestBody RoleListQueryParam param) {
         return Result.ok(sysRoleService.roleList(param));
     }
 

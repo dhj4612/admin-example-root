@@ -1,5 +1,5 @@
 <template>
-  <a-button type="primary" @click="onAddClick">
+  <a-button v-auth="'sys:role:add'" type="primary" @click="onAddClick">
     新增
   </a-button>
 
@@ -13,7 +13,7 @@
     <template #bodyCell="{column, text, record}">
       <template v-if="column.dataIndex === 'operate'">
         <a-space :size="20">
-          <a v-auth="['sys:role:add','sys:role:update','sys:role:info']"
+          <a v-auth="['sys:role:update','sys:role:info']"
              @click.prevent.stop="onUpdateClick(record.id)">修改</a>
           <a-popconfirm title="Del Role?" @confirm="onDeleteClick(record.id)">
             <a v-auth="'sys:role:del'" @click.prevent.stop="">删除</a>
@@ -25,14 +25,14 @@
 
   <AddOrUpdate :open="addOrUpdateModelOpen"
                :update-id="updateId"
-               @onModelClose="_ => addOrUpdateModelOpen = false"
+               @onModelClose="addOrUpdateModelOpen = false"
                @onRefresh="fetchTableData"
   />
 </template>
 
 <script setup>
 import {yyyy_mm_dd_hh_mm_ss} from "@/utils/tools.js";
-import {fetchRoleListApi, roleDelApi} from "@/api/index.js";
+import {fetchRolePageApi, roleDelApi} from "@/api/index.js";
 import {useTable} from "@/hooks/useTable.js";
 import AddOrUpdate from "@/views/sys/role/component/AddOrUpdate.vue";
 import {ref} from "vue";
@@ -72,7 +72,7 @@ const {
   handleTableChange,
   fetchTableData
 } = useTable({
-  fetchApi: fetchRoleListApi,
+  fetchApi: fetchRolePageApi,
 })
 
 const addOrUpdateModelOpen = ref(false)

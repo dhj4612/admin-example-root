@@ -46,6 +46,8 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
             String jwt = authorizationHeader.substring(7);
             UserAuthorized userAuthorized = JwtUtil.verifyJwtStrAndGetForCache(jwt);
 
+            // TODO 用户账户状态判断
+
             // 设置用户上下文信息
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(userAuthorized, null,

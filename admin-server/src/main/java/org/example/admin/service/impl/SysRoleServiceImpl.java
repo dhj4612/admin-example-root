@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -105,7 +106,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     }
 
     @Override
-    public BasePageResult<SysRoleResult> roleList(RoleListQueryParam param) {
+    public BasePageResult<SysRoleResult> rolePage(RoleListQueryParam param) {
         Page<SysRole> pageResult = lambdaQuery()
                 .page(new Page<>(param.getCurrent(), param.getPageSize()));
 
@@ -128,5 +129,10 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         // 查询出没有子节点的 menuId 即最小一级的 menu
         sysRoleResult.setMenuIds(sysRoleMenuService.getLowestMenuIdsByRoleId(sysRole.getId()));
         return sysRoleResult;
+    }
+
+    @Override
+    public List<SysRoleResult> roleList(RoleListQueryParam param) {
+        return list().stream().map(role -> BeanUtil.toBean(role, SysRoleResult.class)).toList();
     }
 }

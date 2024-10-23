@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.example.admin.mapper.SysUserMapper;
 import org.example.admin.model.entity.SysMenu;
 import org.example.admin.model.entity.SysRole;
@@ -57,16 +58,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         final boolean update = param.id() != null;
         SysUser sysUser;
         if (update) {
-            sysUser = lambdaQuery()
-                    .eq(SysUser::getStatus, 1)
-                    .eq(BaseEntity::getId, param.id()).one();
+            sysUser = getById(param.id());
             Assert.notNull(sysUser, "用户不存在或已禁用");
             Assert.state(!Objects.equals(sysUser.getSuperAdmin(), 1), "管理员账户不能修改");
 
             boolean change = false;
             LambdaQueryChainWrapper<SysUser> condition = lambdaQuery();
-            if (!Objects.equals(sysUser.getMobile(), param.phone())) {
-                condition.eq(SysUser::getMobile, param.phone());
+            if (!Objects.equals(sysUser.getMobile(), param.mobile())) {
+                condition.eq(SysUser::getMobile, param.mobile());
                 change = true;
             }
             if (!Objects.equals(sysUser.getUsername(), param.username())) {
@@ -78,7 +77,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             }
         } else {
             Assert.isNull(lambdaQuery()
-                    .eq(SysUser::getMobile, DbEncryptHelper.encrypt(param.phone()))
+                    .eq(SysUser::getMobile, DbEncryptHelper.encrypt(param.mobile()))
                     .or()
                     .eq(SysUser::getUsername, param.username())
                     .one(), "手机号或用户名已存在");
@@ -86,10 +85,20 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
 
         sysUser.setUsername(param.username());
-        sysUser.setPassword(passwordEncoder.encode(param.password()));
-        sysUser.setMobile(param.phone());
+        if (update) {
+            if (StringUtils.isNoneBlank(param.password())) {
+                sysUser.setPassword(passwordEncoder.encode(param.password()));
+            }
+        } else {
+            Assert.state(StringUtils.isNoneBlank(param.password()), "密码不能为空");
+            sysUser.setPassword(passwordEncoder.encode(param.password()));
+        }
+        sysUser.setMobile(param.mobile());
         sysUser.setStatus(1);
+        sysUser.setRealName(param.realName());
         sysUser.setSuperAdmin(0);
+        sysUser.setGender(param.gender() == null ? 2 : param.gender());
+        sysUser.setStatus(param.status());
 
         saveOrUpdate(sysUser);
 
@@ -199,7 +208,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    public BasePageResult<SysUserResult> userList(UserListQueryParam param) {
+    public BasePageResult<SysUserResult> userPage(UserListQueryParam param) {
         return new BasePageResult<>(lambdaQuery()
                 .page(new Page<>(param.getCurrent(), param.getPageSize()))
                 .convert(item -> {
@@ -216,7 +225,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             throw BizException.valueOfMsg("用户不存在");
         }
         SysUserInfoResult sysUserInfoResult = BeanUtil.copyProperties(user, SysUserInfoResult.class);
-
+        sysUserInfoResult.setMobile(DbEncryptHelper.decrypt(user.getMobile()));
         sysUserInfoResult.setRoleIds(
                 sysUserRoleService.lambdaQuery()
                         .eq(SysUserRole::getUserId, user.getId())

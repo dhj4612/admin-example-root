@@ -15,10 +15,10 @@
           :wrapper-col="{span: 20}"
           ref="addOrUpdateFormRef">
         <a-form-item required label="名称" name="name">
-          <a-input v-model:value="addOrUpdateFormState.name"/>
+          <a-input v-model:value.trim="addOrUpdateFormState.name"/>
         </a-form-item>
         <a-form-item required label="编码" name="roleCode">
-          <a-input v-model:value="addOrUpdateFormState.roleCode"/>
+          <a-input v-model:value.trim="addOrUpdateFormState.roleCode"/>
         </a-form-item>
 
         <a-form-item label="备注" name="remark">
@@ -63,7 +63,7 @@ const props = defineProps({
 const emits = defineEmits(['onModelOk', 'onModelClose', 'onRefresh']);
 
 const modelConfirmLoading = ref(false)
-const onModelConfirm = async () => {
+const onModelConfirm = _ => {
   addOrUpdateFormRef.value.validate()
       .then(async formState => {
         modelConfirmLoading.value = true
@@ -72,10 +72,13 @@ const onModelConfirm = async () => {
         }
         if (!formState.menuIds) {
           formState.menuIds = []
+        } else if (formState.menuIds.length) {
+          formState.menuIds = [...fullSelectMenuIds]
         }
         const [_, e] = await addOrUpdateRoleApi(formState)
         if (e) {
-          message.warn(e.msg)
+          modelConfirmLoading.value = false
+          return message.warn(e.msg)
         }
         modelConfirmLoading.value = false
         emits('onModelClose')
@@ -106,12 +109,12 @@ watch(_ => addOrUpdateFormState.menuIds, _ => {
       return collectFullPathTreeIds(menuId, src)
     }).flatMap(id => id);
     fullSelectMenuIds = new Set(collectFullIds)
-    console.log(fullSelectMenuIds)
   }
 })
 
 watch(_ => props.open, async _ => {
   if (props.open === true) {
+    Object.keys(addOrUpdateFormState).forEach(key => addOrUpdateFormState[key] = undefined)
     const [r, e] = await fetchMenuListApi()
     if (e) {
       return message.warn(e.msg)
@@ -121,7 +124,6 @@ watch(_ => props.open, async _ => {
       valueName: 'label'
     });
 
-    Object.keys(addOrUpdateFormState).forEach(key => addOrUpdateFormState[key] = undefined)
     if (!Number.isNaN(props.updateId)) {
       const [r, e] = await fetchRoleInfoApi({id: props.updateId})
       if (e) {

@@ -1,7 +1,6 @@
 package org.example.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import jakarta.validation.Valid;
 import org.example.admin.model.entity.SysUser;
 import org.example.admin.model.param.*;
 import org.example.admin.model.result.*;
@@ -31,7 +30,7 @@ public interface SysUserService extends IService<SysUser> {
 
     void logout();
 
-    BasePageResult<SysUserResult> userList(UserListQueryParam param);
+    BasePageResult<SysUserResult> userPage(UserListQueryParam param);
 
     SysUserInfoResult getUpdateUserInfo(SysUserInfoQueryParam param);
 
