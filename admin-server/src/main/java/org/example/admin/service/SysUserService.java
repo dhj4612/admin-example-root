@@ -3,11 +3,9 @@ package org.example.admin.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.validation.Valid;
 import org.example.admin.model.entity.SysUser;
-import org.example.admin.model.param.UserPhoneLoginParam;
-import org.example.admin.model.param.UserSaveOrUpdateParam;
-import org.example.admin.model.result.SysMenuResult;
-import org.example.admin.model.result.UserInfoResult;
-import org.example.admin.model.result.UserLoginResult;
+import org.example.admin.model.param.*;
+import org.example.admin.model.result.*;
+import org.example.framework.common.base.BasePageResult;
 
 import java.util.List;
 import java.util.Set;
@@ -17,9 +15,9 @@ import java.util.Set;
  */
 public interface SysUserService extends IService<SysUser> {
 
-    void userSaveOrUpdate(@Valid UserSaveOrUpdateParam param);
+    void userSaveOrUpdate(UserSaveOrUpdateParam param);
 
-    UserLoginResult phoneLogin(@Valid UserPhoneLoginParam param);
+    UserLoginResult phoneLogin(UserPhoneLoginParam param);
 
     UserInfoResult getUserInfo();
 
@@ -32,4 +30,10 @@ public interface SysUserService extends IService<SysUser> {
     List<SysMenuResult> getUserMenuNav();
 
     void logout();
+
+    BasePageResult<SysUserResult> userList(UserListQueryParam param);
+
+    SysUserInfoResult getUpdateUserInfo(SysUserInfoQueryParam param);
+
+    void delUser(UserDelParam param);
 }

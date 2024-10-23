@@ -2,23 +2,23 @@ package org.example.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.example.admin.mapper.SysUserMapper;
 import org.example.admin.model.entity.SysMenu;
 import org.example.admin.model.entity.SysRole;
 import org.example.admin.model.entity.SysUser;
+import org.example.admin.model.entity.SysUserRole;
 import org.example.admin.model.event.SyncUserRoleAuthorityEvent;
-import org.example.admin.model.param.UserPhoneLoginParam;
-import org.example.admin.model.param.UserSaveOrUpdateParam;
-import org.example.admin.model.result.SysMenuResult;
-import org.example.admin.model.result.UserInfoResult;
-import org.example.admin.model.result.UserLoginResult;
+import org.example.admin.model.param.*;
+import org.example.admin.model.result.*;
 import org.example.admin.service.SysMenuService;
 import org.example.admin.service.SysRoleService;
 import org.example.admin.service.SysUserRoleService;
 import org.example.admin.service.SysUserService;
 import org.example.framework.common.base.BaseEntity;
+import org.example.framework.common.base.BasePageResult;
 import org.example.framework.common.exception.BizException;
 import org.example.framework.database.core.DbEncryptHelper;
 import org.example.framework.security.core.user.SecurityUserContext;
@@ -196,5 +196,50 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public void logout() {
         RedisUtil.StringRedisTemplate.delete("login:session:" +
                 AesUtil.encrypt(String.valueOf(SecurityUserContext.ensureGetUser().getId())));
+    }
+
+    @Override
+    public BasePageResult<SysUserResult> userList(UserListQueryParam param) {
+        return new BasePageResult<>(lambdaQuery()
+                .page(new Page<>(param.getCurrent(), param.getPageSize()))
+                .convert(item -> {
+                    item.setMobile(DbEncryptHelper.decrypt(item.getMobile()));
+                    return BeanUtil.copyProperties(item, SysUserResult.class);
+                })
+        );
+    }
+
+    @Override
+    public SysUserInfoResult getUpdateUserInfo(SysUserInfoQueryParam param) {
+        SysUser user = getById(param.id());
+        if (user == null) {
+            throw BizException.valueOfMsg("用户不存在");
+        }
+        SysUserInfoResult sysUserInfoResult = BeanUtil.copyProperties(user, SysUserInfoResult.class);
+
+        sysUserInfoResult.setRoleIds(
+                sysUserRoleService.lambdaQuery()
+                        .eq(SysUserRole::getUserId, user.getId())
+                        .list().stream().map(SysUserRole::getRoleId)
+                        .collect(Collectors.toSet()));
+
+        return sysUserInfoResult;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void delUser(UserDelParam param) {
+        boolean removed = lambdaUpdate()
+                .eq(SysUser::getId, param.id())
+                .remove();
+
+        if (removed) {
+            sysUserRoleService.lambdaUpdate()
+                    .eq(SysUserRole::getUserId, param.id())
+                    .remove();
+            // 删除登录会话
+            RedisUtil.StringRedisTemplate.delete("login:session:" +
+                    AesUtil.encrypt(String.valueOf(param.id())));
+        }
     }
 }

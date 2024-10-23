@@ -50,3 +50,11 @@ export const fetchRoleInfoApi = (data = {}) => ApiWrapper(post('/sys/manager/rol
 export const addOrUpdateRoleApi = (data = {}) => ApiWrapper(post('/sys/manager/role-add-or-update', data))
 
 export const roleDelApi = (data = {}) => ApiWrapper(post('/sys/manager/role/del', data))
+
+export const fetchUserListApi = (data = {}) => ApiWrapper(post('/sys/user/list', data))
+
+export const fetchUserUpdateInfoApi = (data = {}) => ApiWrapper(post('/sys/user/update-info', data))
+
+export const userDelApi = (data = {}) => ApiWrapper(post('/sys/user/del', data))
+
+export const userAddOrUpdateApi = (data = {}) => ApiWrapper(post('/sys/user/add-or-update', data))

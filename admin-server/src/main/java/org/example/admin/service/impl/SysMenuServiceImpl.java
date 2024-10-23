@@ -1,7 +1,6 @@
 package org.example.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.example.admin.mapper.SysMenuMapper;
@@ -45,25 +44,15 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             menu = getById(param.id());
             Assert.notNull(menu, "菜单不存在");
 
-            boolean change = false;
-            LambdaQueryChainWrapper<SysMenu> condition = lambdaQuery();
-            if (!Objects.equals(menu.getName(), param.name())) {
-                condition.eq(SysMenu::getName, param.name());
-                change = true;
-            }
             if (!Objects.equals(menu.getAuthority(), param.authority())) {
-                condition.or().eq(SysMenu::getAuthority, param.authority());
-                change = true;
-            }
-            if (change) {
-                Assert.state(!condition.exists(), "菜单名称或授权标识已存在");
+                Assert.state(!lambdaQuery()
+                                .eq(SysMenu::getAuthority, param.authority()).exists(),
+                        "授权标识已存在");
             }
         } else {
-            menu = lambdaQuery().eq(SysMenu::getName, param.name())
-                    .or()
-                    .eq(SysMenu::getAuthority, param.authority())
-                    .one();
-            Assert.isNull(menu, "菜单名称或授权标识已存在");
+            Assert.state(!lambdaQuery()
+                            .eq(SysMenu::getAuthority, param.authority()).exists(),
+                    "授权标识已存在");
             menu = new SysMenu();
         }
 
