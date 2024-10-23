@@ -24,7 +24,10 @@ export const deepFindNodeById = (id, src) => {
             return src[i]
         }
         if (src[i].children && src[i].children.length) {
-            return deepFindNodeById(id, src[i].children)
+            const target = deepFindNodeById(id, src[i].children);
+            if (target) {
+                return target
+            }
         }
     }
 }
