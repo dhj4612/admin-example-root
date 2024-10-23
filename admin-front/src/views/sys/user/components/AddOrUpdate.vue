@@ -88,7 +88,6 @@ const onModelConfirm = _ => {
         if (!formState.menuIds) {
           formState.menuIds = []
         }
-        console.log(formState)
         const [_, e] = await userAddOrUpdateApi(formState)
         if (e) {
           modelConfirmLoading.value = false
