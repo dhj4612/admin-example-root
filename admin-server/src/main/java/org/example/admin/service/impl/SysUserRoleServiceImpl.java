@@ -1,6 +1,5 @@
 package org.example.admin.service.impl;
 
-
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -42,10 +41,10 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
         // 需要新增的角色id集合
         Collection<Integer> saveRoleIds = CollUtil.subtract(roleIds, userRoleIds);
         // 建立新的关联关系
-        List<SysUserRole> userRoleList = saveRoleIds.stream()
+        List<SysUserRole> saveUserRoleList = saveRoleIds.stream()
                 .map(id -> new SysUserRole().setRoleId(id).setUserId(userId))
                 .toList();
-        saveBatch(userRoleList);
+        saveBatch(saveUserRoleList);
 
         // 查出旧的关联关系删除
         Collection<Integer> removeRoleIds = CollUtil.subtract(userRoleIds, roleIds);

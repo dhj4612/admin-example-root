@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import {computed, ref, onUnmounted} from "vue";
+import {computed, onUnmounted, ref} from "vue";
 import {yyyy_mm_dd_hh_mm_ss} from "@/utils/tools.js";
 
 const timestamp = ref(Date.now());

@@ -50,9 +50,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                         "授权标识已存在");
             }
         } else {
-            Assert.state(!lambdaQuery()
-                            .eq(SysMenu::getAuthority, param.authority()).exists(),
-                    "授权标识已存在");
+            Assert.state(!lambdaQuery().eq(SysMenu::getAuthority, param.authority()).exists(), "授权标识已存在");
             menu = new SysMenu();
         }
 

@@ -126,7 +126,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             throw BizException.valueOfMsg("角色不存在");
         }
         SysRoleInfoResult sysRoleResult = BeanUtil.copyProperties(sysRole, SysRoleInfoResult.class);
-        // 查询出没有子节点的 menuId 即最小一级的 menu
+        // 查询出没有子节点的 menuId，即最小一级的 menu
         sysRoleResult.setMenuIds(sysRoleMenuService.getLowestMenuIdsByRoleId(sysRole.getId()));
         return sysRoleResult;
     }

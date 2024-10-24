@@ -8,6 +8,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.example.framework.common.exception.BizException;
+import org.example.framework.security.core.user.SecurityUserContext;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -67,8 +68,7 @@ public class NoDuplicateSubmitAspect {
      * @return 当前操作用户 ID
      */
     private String getCurrentUserId() {
-        // 用户属于非核心功能，这里先通过模拟的形式代替。后续如果需要后管展示，会重构该代码
-        return "1810518709471555585";
+        return String.valueOf(SecurityUserContext.getUserId());
     }
 
     /**

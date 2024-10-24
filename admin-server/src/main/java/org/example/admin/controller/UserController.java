@@ -49,10 +49,10 @@ public class UserController {
         return Result.ok();
     }
 
-    @PostMapping("/phone/login")
+    @PostMapping("/login")
     @Anonymous
-    public Result<UserLoginResult> register(@RequestBody @Valid UserPhoneLoginParam param) {
-        return Result.ok(sysUserService.phoneLogin(param));
+    public Result<UserLoginResult> login(@RequestBody @Valid UserLoginParam param) {
+        return Result.ok(sysUserService.login(param));
     }
 
     @PostMapping("/logout")

@@ -11,10 +11,10 @@
 
       <a-form-item
           style="width: 500px"
-          label="用户名"
-          name="phone"
+          label="账户"
+          name="account"
           :rules="[{ required: true, message: '请输入用户名' }]">
-        <a-input allow-clear v-model:value="formState['phone']"/>
+        <a-input placeholder="请输入用户名或手机号" allow-clear v-model:value="formState['account']"/>
       </a-form-item>
 
       <a-form-item
@@ -22,11 +22,11 @@
           label="密码"
           name="password"
           :rules="[{ required: true, message: '请输入密码' }]">
-        <a-input-password allow-clear v-model:value="formState['password']"/>
+        <a-input-password placeholder="请输入密码" allow-clear v-model:value="formState['password']"/>
       </a-form-item>
 
       <a-form-item :wrapper-col="{offset: 7}">
-        <div style="width: 100px">
+        <div style="width: 350px">
           <a-button block :loading="loading" type="primary" html-type="submit">登录</a-button>
         </div>
       </a-form-item>

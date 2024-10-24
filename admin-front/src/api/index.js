@@ -25,7 +25,7 @@ const ApiWrapper = (apiAction, options = def_options) => {
 
 export const exampleApi = (data = {}) => ApiWrapper(post('/example', data))
 
-export const loginApi = (data = {}) => ApiWrapper(post('/sys/user/phone/login', data))
+export const loginApi = (data = {}) => ApiWrapper(post('/sys/user/login', data))
 
 export const logoutApi = _ => ApiWrapper(post('/sys/user/logout'))
 

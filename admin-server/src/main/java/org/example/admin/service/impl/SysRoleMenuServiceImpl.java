@@ -45,10 +45,10 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
 
         Collection<Integer> saveMenuIds = CollUtil.subtract(menuIds, roleMenuIds);
 
-        List<SysRoleMenu> roleMenuList = saveMenuIds.stream()
+        List<SysRoleMenu> saveRoleMenuList = saveMenuIds.stream()
                 .map(menuId -> new SysRoleMenu().setMenuId(menuId).setRoleId(id))
                 .toList();
-        saveBatch(roleMenuList);
+        saveBatch(saveRoleMenuList);
 
         Collection<Integer> removeMenuIds = CollUtil.subtract(roleMenuIds, menuIds);
         if (CollUtil.isNotEmpty(removeMenuIds)) {
@@ -61,8 +61,7 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
 
     @Override
     public Set<Integer> getLowestMenuIdsByRoleId(Integer roleId) {
-        List<SysRoleMenu> sysRoleMenuList = lambdaQuery().eq(SysRoleMenu::getRoleId, roleId)
-                .list();
+        List<SysRoleMenu> sysRoleMenuList = lambdaQuery().eq(SysRoleMenu::getRoleId, roleId).list();
         List<SysMenu> menus = applicationContext.getBean(SysMenuService.class).lambdaQuery().list();
         return sysRoleMenuList.stream()
                 .map(SysRoleMenu::getMenuId)

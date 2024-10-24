@@ -1,8 +1,6 @@
 package org.example.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import jakarta.validation.Valid;
-import org.apache.ibatis.annotations.Param;
 import org.example.admin.model.entity.SysMenu;
 import org.example.admin.model.param.MenuAddOrUpdateParam;
 import org.example.admin.model.param.MenuDelParam;
@@ -10,7 +8,6 @@ import org.example.admin.model.result.SysMenuResult;
 import org.example.framework.security.core.user.UserAuthorized;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * 菜单管理

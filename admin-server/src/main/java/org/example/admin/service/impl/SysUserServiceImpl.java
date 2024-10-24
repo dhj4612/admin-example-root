@@ -37,7 +37,6 @@ import org.springframework.util.Assert;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 /**
  * 用户管理
  *
@@ -110,13 +109,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    public UserLoginResult phoneLogin(UserPhoneLoginParam param) {
+    public UserLoginResult login(UserLoginParam param) {
         SysUser sysUser = lambdaQuery()
-                .eq(SysUser::getMobile, DbEncryptHelper.encrypt(param.phone()))
+                .eq(SysUser::getMobile, DbEncryptHelper.encrypt(param.account()))
+                .or()
+                .eq(SysUser::getUsername, param.account())
                 .one();
         Assert.notNull(sysUser, "用户不存在");
         Assert.state(Objects.equals(sysUser.getStatus(), 1), "用户已被禁用");
         Assert.state(passwordEncoder.matches(param.password(), sysUser.getPassword()), "密码错误");
+
         UserAuthorized userAuthorized = new UserAuthorized()
                 .setId(sysUser.getId())
                 .setAuthorities(getUserAuthoritiesByUserId(sysUser.getId()))
@@ -238,6 +240,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void delUser(UserDelParam param) {
+        SysUser user = getById(param.id());
+        if (Objects.equals(user.getSuperAdmin(), 1)) {
+            throw BizException.valueOfMsg("管理员账户无法删除");
+        }
+
         boolean removed = lambdaUpdate()
                 .eq(SysUser::getId, param.id())
                 .remove();

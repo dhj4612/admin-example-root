@@ -16,7 +16,7 @@ public interface SysUserService extends IService<SysUser> {
 
     void userSaveOrUpdate(UserSaveOrUpdateParam param);
 
-    UserLoginResult phoneLogin(UserPhoneLoginParam param);
+    UserLoginResult login(UserLoginParam param);
 
     UserInfoResult getUserInfo();
 

@@ -12,6 +12,12 @@ public class BaseEntity implements Serializable {
     @TableId(type = IdType.AUTO)
     private Integer id;
 
+    @TableField(fill = FieldFill.INSERT)
+    private Integer creator;
+
+    @TableField(fill = FieldFill.UPDATE)
+    private Integer updater;
+
     /**
      * 逻辑删除 0-未删除 1-删除
      */
