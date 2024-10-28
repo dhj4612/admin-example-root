@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.example.framework.security.config.JwtProperties;
+import org.example.framework.security.core.user.JwtAuthenticationToken;
 import org.example.framework.security.core.user.UserAuthorized;
 import org.example.framework.security.core.utils.JwtUtil;
 import org.example.framework.utils.HttpServletUtil;
@@ -49,9 +50,8 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
             // TODO 用户账户状态判断
 
             // 设置用户上下文信息
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userAuthorized, null,
-                            userAuthorized.getAuthoritiesAdaptionSecurity());
+            JwtAuthenticationToken authentication = JwtAuthenticationToken
+                    .ofAuthenticated(userAuthorized, null, userAuthorized.getAuthoritiesAdaptionSecurity());
             authentication.setDetails(
                     new WebAuthenticationDetailsSource().buildDetails(request)
             );
