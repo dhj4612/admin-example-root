@@ -7,6 +7,7 @@ import org.example.framework.security.core.filter.XssFilter;
 import org.example.framework.security.core.handler.SecurityAccessDeniedHandler;
 import org.example.framework.security.core.handler.SecurityAuthenticationEntryPoint;
 import org.example.framework.utils.ApiResourcesUtil;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,12 +22,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.savedrequest.NullRequestCache;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.util.List;
+import java.util.Set;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity // 启用方法级别的安全控制 => @PreAuthorize
 @RequiredArgsConstructor
+@EnableConfigurationProperties({AllowResourcesProperties.class})
 public class SecurityConfig {
 
     /**
@@ -38,10 +40,14 @@ public class SecurityConfig {
 
     private final ApplicationContext applicationContext;
 
+    private final AllowResourcesProperties allowResourcesProperties;
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // 忽略授权的地址列表
-        List<String> allowResources = ApiResourcesUtil.getApiResourceByAnnotation(applicationContext, Anonymous.class);
+        Set<String> allowResources = allowResourcesProperties.getResources();
+        allowResources.addAll(ApiResourcesUtil.getApiResourceByAnnotation(applicationContext, Anonymous.class));
+
         http
                 // xss 防护
                 .headers(headers -> headers.contentSecurityPolicy(csp -> csp.policyDirectives("script-src 'self'; object-src 'none';")))

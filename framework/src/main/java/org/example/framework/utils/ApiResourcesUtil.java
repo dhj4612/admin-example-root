@@ -5,14 +5,15 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.lang.annotation.Annotation;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class ApiResourcesUtil {
     /**
      * 根据注解类型获取Api资源
      */
-    public static <T extends Annotation> List<String> getApiResourceByAnnotation(ApplicationContext applicationContext, Class<T> annotationType) {
+    public static <T extends Annotation> Set<String> getApiResourceByAnnotation(ApplicationContext applicationContext, Class<T> annotationType) {
         RequestMappingHandlerMapping handlerMapping = applicationContext
                 .getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class);
 
@@ -26,7 +27,7 @@ public class ApiResourcesUtil {
                 })
                 .flatMap(entry -> entry.getKey().getPatternValues().stream())
                 .map(ApiResourcesUtil::convertToAntPattern)
-                .toList();
+                .collect(Collectors.toSet());
     }
 
     private static String convertToAntPattern(String path) {
