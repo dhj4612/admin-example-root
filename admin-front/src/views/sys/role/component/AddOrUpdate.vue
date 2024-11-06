@@ -3,6 +3,7 @@
            :title="updateId ? '修改' : '新增'"
            :width="800"
            centered
+           :force-render="true"
            @cancel="onModelCancel"
            :confirm-loading="modelConfirmLoading"
            @ok="onModelConfirm">
@@ -113,8 +114,9 @@ watch(_ => addOrUpdateFormState.menuIds, _ => {
 })
 
 watch(_ => props.open, async _ => {
+  addOrUpdateFormRef.value.clearValidate()
   if (props.open === true) {
-    Object.keys(addOrUpdateFormState).forEach(key => addOrUpdateFormState[key] = undefined)
+    addOrUpdateFormRef.value.resetFields()
     const [r, e] = await fetchMenuListApi()
     if (e) {
       return message.warn(e.msg)
@@ -132,7 +134,7 @@ watch(_ => props.open, async _ => {
       Object.keys(r).forEach(key => addOrUpdateFormState[key] = r[key])
     }
   }
-}, {immediate: true});
+});
 
 </script>
 

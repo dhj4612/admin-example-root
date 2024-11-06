@@ -3,6 +3,7 @@
            :title="updateId ? '修改' : '新增'"
            :width="800"
            centered
+           :force-render="true"
            @cancel="onModelClose"
            :confirm-loading="modelConfirmLoading"
            @ok="onModelConfirm">
@@ -101,8 +102,9 @@ const onModelConfirm = _ => {
 }
 
 watch(_ => props.open, async _ => {
+  addOrUpdateFormRef.value.clearValidate()
   if (props.open === true) {
-    Object.keys(addOrUpdateFormState).forEach(key => addOrUpdateFormState[key] = undefined)
+    addOrUpdateFormRef.value.resetFields()
     const [r, e] = await fetchRoleListApi()
     if (e) {
       return message.warn(e.msg)

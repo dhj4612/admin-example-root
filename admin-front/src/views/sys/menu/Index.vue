@@ -36,6 +36,7 @@
       :title="addOrUpdateFormState.id ? '修改' : '新增'"
       :width="800"
       centered
+      :force-render="true"
       :confirm-loading="modelConfirmLoading"
       @ok="onModelConfirm">
     <div style="display: flex;justify-content: center;align-items: center">
@@ -173,7 +174,7 @@ const onModelConfirm = () => {
 }
 
 const onAddMenuClick = async (id) => {
-  Object.keys(addOrUpdateFormState).forEach(key => addOrUpdateFormState[key] = undefined)
+  addOrUpdateFormRef.value.resetFields()
   const [res, err] = await fetchMenuListApi({type: 0})
   if (err) {
     return message.warn(err?.msg)
@@ -189,6 +190,7 @@ const onAddMenuClick = async (id) => {
 }
 
 const onUpdateMenuClick = async (id, pid) => {
+  addOrUpdateFormRef.value.resetFields()
   const [r, e] = await fetchMenuInfoApi({id})
   if (e) {
     return message.warn(e.msg)

@@ -6,6 +6,13 @@ export const dataKey = 'data'
 
 const def_options = {showError: true, handlerError: e => console.log(e)}
 
+
+/**
+ * @param apiAction
+ * @param options
+ * @returns {Promise<[res:object,err:{msg:string}]>}
+ * @constructor
+ */
 const ApiWrapper = (apiAction, options = def_options) => {
     return new Promise(resolve => apiAction
         .then(result => {
